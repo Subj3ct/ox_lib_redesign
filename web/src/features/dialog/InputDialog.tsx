@@ -16,7 +16,7 @@ import DateField from './components/fields/date';
 import TextareaField from './components/fields/textarea';
 import TimeField from './components/fields/time';
 import dayjs from 'dayjs';
-import { useGlassmorphism } from '../../components/GameRender';
+import { useConditionalGlassmorphism } from '../../components/GameRender';
 
 export type FormValues = {
   test: {
@@ -38,7 +38,7 @@ const horizontalPulse = keyframes({
     transform: 'translateX(0)', 
   },
   '50%': {
-    transform: 'translateX(140px)', 
+    transform: 'translateX(220px)', 
   },
   '100%': {
     transform: 'translateX(0)', 
@@ -244,12 +244,14 @@ const InputDialog: React.FC = () => {
     rows: [{ type: 'input', label: '' }],
   });
   const [visible, setVisible] = React.useState(false);
+  const [preWarm, setPreWarm] = React.useState(false); // Pre-warm glassmorphism
   const [isExiting, setIsExiting] = React.useState(false);
   const { locale } = useLocales();
   const { classes, cx } = useStyles();
   const theme = useMantineTheme();
 
-  useGlassmorphism();
+  // Enable glassmorphism when dialog is visible OR pre-warming
+  useConditionalGlassmorphism(Boolean(visible || preWarm), 'InputDialog');
 
   const form = useForm<{ test: { value: any }[] }>({});
   const fieldForm = useFieldArray({
@@ -258,9 +260,11 @@ const InputDialog: React.FC = () => {
   });
 
   useNuiEvent<InputProps>('openDialog', (data) => {
+    // Pre-warm glassmorphism for instant canvas availability
+    setPreWarm(true);
     setFields(data);
-    setVisible(true);
     setIsExiting(false);
+    
     data.rows.forEach((row, index) => {
       fieldForm.insert(
         index,
@@ -285,12 +289,19 @@ const InputDialog: React.FC = () => {
         ) as Array<OptionValue>;
       }
     });
+    
+    // Small delay to ensure canvas is ready, then show dialog
+    setTimeout(() => {
+      setVisible(true);
+      setPreWarm(false); // Stop pre-warming, visible takes over
+    }, 50); // 50ms pre-warm for instant appearance
   });
 
   useNuiEvent('closeInputDialog', async () => await handleClose(true));
 
   const handleClose = async (dontPost?: boolean) => {
     setIsExiting(true);
+    setPreWarm(false); // Stop pre-warming
     setTimeout(async () => {
       setVisible(false);
       setIsExiting(false);

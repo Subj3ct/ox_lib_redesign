@@ -166,19 +166,35 @@ const useStyles = createStyles((theme, params: { difficultyOffset: number; isExi
       position: 'relative',
       width: '100%',
       height: '100%',
-      background: 'rgba(255, 255, 255, 0.1)',
-      border: `2px solid ${themeColor}`, // Theme color border around outer edge
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      boxShadow: `0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 30px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4)`,
+      background: `
+        linear-gradient(135deg, 
+          rgba(255, 255, 255, 0.25) 0%,
+          rgba(255, 255, 255, 0.18) 25%,
+          rgba(255, 255, 255, 0.12) 50%,
+          rgba(255, 255, 255, 0.08) 75%,
+          rgba(255, 255, 255, 0.15) 100%
+        ),
+        linear-gradient(45deg,
+          rgba(120, 120, 120, 0.4) 0%,
+          rgba(100, 100, 100, 0.5) 50%,
+          rgba(80, 80, 80, 0.6) 100%
+        )
+      `,
+      border: `2px solid ${themeColor}`, 
+      boxShadow: `
+        0 12px 40px rgba(0, 0, 0, 0.5),
+        0 6px 20px rgba(0, 0, 0, 0.4),
+        0 0 30px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+      `,
       borderRadius: '50%', // Circular container
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
       fontFamily: 'Roboto',
       overflow: 'hidden',
-      pointerEvents: 'auto', // Re-enable pointer events for the actual container
-      // Apply breathing animation to background
+      pointerEvents: 'auto', 
       '&::before': {
         content: '""',
         position: 'absolute',
@@ -186,12 +202,16 @@ const useStyles = createStyles((theme, params: { difficultyOffset: number; isExi
         left: 0,
         right: 0,
         bottom: 0,
-        background: 'inherit',
+        background: `
+          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.10) 0%, transparent 50%),
+          radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 40%)
+        `,
         borderRadius: 'inherit',
         animation: `${breathe} 3s ease-in-out infinite`,
         zIndex: -1,
+        pointerEvents: 'none',
       },
-      // Entrance/exit animations - now won't conflict with positioning
       animation: params.isExiting 
         ? `${slideOutScale} 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards`
         : `${slideInScale} 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards`,
@@ -318,6 +338,7 @@ const useStyles = createStyles((theme, params: { difficultyOffset: number; isExi
 const SkillCheck: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+  const [preWarm, setPreWarm] = useState(false); // Pre-warm glassmorphism
   const dataRef = useRef<{ difficulty: GameDifficulty | GameDifficulty[]; inputs?: string[] } | null>(null);
   const dataIndexRef = useRef<number>(0);
   const [skillCheck, setSkillCheck] = useState<SkillCheckProps>({
@@ -327,6 +348,9 @@ const SkillCheck: React.FC = () => {
     key: 'e',
   });
   const { classes } = useStyles({ difficultyOffset: skillCheck.difficultyOffset, isExiting });
+
+  // Enable glassmorphism when skillcheck is visible OR pre-warming
+  // useConditionalGlassmorphism(visible || preWarm, 'SkillCheck');
 
   useNuiEvent('startSkillCheck', (data: { difficulty: GameDifficulty | GameDifficulty[]; inputs?: string[] }) => {
     dataRef.current = data;
@@ -346,12 +370,20 @@ const SkillCheck: React.FC = () => {
       key: randomKey.toLowerCase(),
     });
 
-    setIsExiting(false);
-    setVisible(true);
+    // Pre-warm glassmorphism for instant canvas availability
+    setPreWarm(true);
+    
+    // Small delay to ensure canvas is ready, then show skillcheck
+    setTimeout(() => {
+      setIsExiting(false);
+      setVisible(true);
+      setPreWarm(false); // Stop pre-warming, visible takes over
+    }, 50); // 50ms pre-warm for instant appearance
   });
 
   useNuiEvent('skillCheckCancel', () => {
     setIsExiting(true);
+    setPreWarm(false); // Stop pre-warming
     setTimeout(() => {
       setVisible(false);
       setIsExiting(false);
@@ -363,6 +395,7 @@ const SkillCheck: React.FC = () => {
     if (!dataRef.current) return;
     if (!success || !Array.isArray(dataRef.current.difficulty)) {
       setIsExiting(true);
+      setPreWarm(false); // Stop pre-warming
       setTimeout(() => {
         setVisible(false);
         setIsExiting(false);
@@ -372,6 +405,7 @@ const SkillCheck: React.FC = () => {
 
     if (dataIndexRef.current >= dataRef.current.difficulty.length - 1) {
       setIsExiting(true);
+      setPreWarm(false); // Stop pre-warming
       setTimeout(() => {
         setVisible(false);
         setIsExiting(false);

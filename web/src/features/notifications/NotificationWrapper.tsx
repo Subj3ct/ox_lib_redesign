@@ -2,13 +2,12 @@ import { useNuiEvent } from '../../hooks/useNuiEvent';
 import { toast, Toaster } from 'react-hot-toast';
 import ReactMarkdown from 'react-markdown';
 import { Box, Center, createStyles, Group, keyframes, RingProgress, Stack, Text, ThemeIcon } from '@mantine/core';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import tinycolor from 'tinycolor2';
 import type { NotificationProps } from '../../typings';
 import MarkdownComponents from '../../config/MarkdownComponents';
 import LibIcon from '../../components/LibIcon';
 import Glass from '../../components/Glass';
-import { useGlassmorphism } from '../../components/GameRender';
 
 const breathe = keyframes({
   '0%, 100%': { 
@@ -56,12 +55,45 @@ const useStyles = createStyles((theme) => ({
     position: 'relative',
     overflow: 'hidden',
     fontFamily: 'Roboto',
-    background: 'rgba(255, 255, 255, 0.1)',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+    background: `
+      linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.25) 0%,
+        rgba(255, 255, 255, 0.18) 25%,
+        rgba(255, 255, 255, 0.12) 50%,
+        rgba(255, 255, 255, 0.08) 75%,
+        rgba(255, 255, 255, 0.15) 100%
+      ),
+      linear-gradient(45deg,
+        rgba(100, 100, 100, 0.4) 0%,
+        rgba(80, 80, 80, 0.5) 50%,
+        rgba(60, 60, 60, 0.6) 100%
+      )
+    `,
+    border: '1px solid rgba(255, 255, 255, 0.3)',
+    borderRadius: '12px',
+    boxShadow: `
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      0 4px 16px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+    `,
     animation: `${breathe} 3s ease-in-out infinite`,
+    // Add subtle texture overlay
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: `
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.08) 0%, transparent 30%)
+      `,
+      borderRadius: 'inherit',
+      pointerEvents: 'none',
+    },
   },
   containerEntering: {
     animation: `${slideInScale} 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, ${breathe} 3s ease-in-out infinite 0.6s`,
@@ -157,9 +189,38 @@ const useStyles = createStyles((theme) => ({
     width: 4,
     height: '100%',
     borderRadius: '0 2px 2px 0',
-    background: 'linear-gradient(180deg, var(--accent-color), var(--accent-color-dim))',
-    boxShadow: '0 0 12px var(--accent-color), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+    background: `
+      linear-gradient(180deg, 
+        var(--accent-color) 0%, 
+        var(--accent-color-dim) 50%,
+        var(--accent-color) 100%
+      )
+    `,
+    boxShadow: `
+      0 0 20px var(--accent-color), 
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+      2px 0 10px rgba(0, 0, 0, 0.3)
+    `,
     animation: `${breathe} 2.5s ease-in-out infinite`,
+    // Add extra glow effect
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      background: `
+        linear-gradient(180deg,
+          rgba(255, 255, 255, 0.3) 0%,
+          transparent 30%,
+          transparent 70%,
+          rgba(255, 255, 255, 0.2) 100%
+        )
+      `,
+      borderRadius: 'inherit',
+    },
   },
 }));
 
@@ -189,7 +250,7 @@ const NotificationComponent: React.FC<{
   const { classes, cx } = useStyles();
   const [toastKey, setToastKey] = useState(0);
   
-  useGlassmorphism();
+  // No glassmorphism
 
   const duration = notification.duration || 4000;
   let iconColor: string;

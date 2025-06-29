@@ -28,5 +28,5 @@ https://www.npmjs.com/package/@communityox/ox_lib
 
 - Install [Lua Language Server](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) to ease development with annotations, type checking, diagnostics, and more.
 - Install [CfxLua IntelliSense](https://marketplace.visualstudio.com/items?itemName=communityox.cfxlua-vscode-cox) to add natives and cfxlua runtime declarations to LLS.
-- You can load ox_lib into your global development environment by modifying workspace/user settings "Lua.workspace.library" with the resource path.
-  - e.g. "c:/fxserver/resources/ox_lib"
+  - You can load ox_lib into your global development environment by modifying workspace/user settings "Lua.workspace.library" with the resource path.
+    - e.g. "c:/fxserver/resources/ox_lib"

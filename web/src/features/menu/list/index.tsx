@@ -30,8 +30,19 @@ const breathe = keyframes({
 
 const useStyles = createStyles((theme, params: { position?: MenuPosition; itemCount: number; selected: number }) => ({
   tooltip: {
-    background: 'rgba(255, 255, 255, 0.1)',
-    backdropFilter: 'blur(20px)',
+    // Fake glassmorphism - no backdrop-filter to prevent black background
+    background: `
+      linear-gradient(160deg, 
+        rgba(255, 255, 255, 0.18) 0%,
+        rgba(255, 255, 255, 0.12) 50%,
+        rgba(255, 255, 255, 0.15) 100%
+      ),
+      linear-gradient(20deg,
+        rgba(255, 255, 255, 0.20) 0%,
+        rgba(255, 255, 255, 0.25) 50%,
+        rgba(255, 255, 255, 0.22) 100%
+      )
+    `,
     border: '1px solid rgba(255, 255, 255, 0.2)',
     borderRadius: 12,
     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
@@ -55,13 +66,40 @@ const useStyles = createStyles((theme, params: { position?: MenuPosition; itemCo
     bottom: params.position === 'bottom-left' || params.position === 'bottom-right' ? 1 : undefined,
     fontFamily: 'Roboto',
     width: 384,
-    background: 'rgba(255, 255, 255, 0.1)',
-    backdropFilter: 'blur(20px)',
+    // Fake glassmorphism - no backdrop-filter to prevent black background
+    background: `
+      linear-gradient(160deg, 
+        rgba(255, 255, 255, 0.18) 0%,
+        rgba(255, 255, 255, 0.12) 50%,
+        rgba(255, 255, 255, 0.15) 100%
+      ),
+      linear-gradient(20deg,
+        rgba(255, 255, 255, 0.20) 0%,
+        rgba(255, 255, 255, 0.25) 50%,
+        rgba(255, 255, 255, 0.22) 100%
+      )
+    `,
     border: '1px solid rgba(255, 255, 255, 0.2)',
     borderRadius: 12,
     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
     animation: `${slideInScale} 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), ${breathe} 4s ease-in-out infinite`,
     overflow: 'hidden',
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: `
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 40%)
+      `,
+      borderRadius: 'inherit',
+      zIndex: -1,
+      pointerEvents: 'none',
+    },
   },
   buttonsWrapper: {
     height: 'fit-content',
@@ -70,12 +108,33 @@ const useStyles = createStyles((theme, params: { position?: MenuPosition; itemCo
     borderTopRightRadius: 0,
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: params.itemCount <= 6 || params.selected === params.itemCount - 1 ? 12 : 0,
-    background: 'rgba(255, 255, 255, 0.05)',
-    backdropFilter: 'blur(10px)',
+    background: `
+      linear-gradient(160deg, 
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(255, 255, 255, 0.06) 100%
+      ),
+      linear-gradient(20deg,
+        rgba(255, 255, 255, 0.10) 0%,
+        rgba(255, 255, 255, 0.12) 50%,
+        rgba(255, 255, 255, 0.11) 100%
+      )
+    `,
   },
   scrollArrow: {
-    background: 'rgba(255, 255, 255, 0.1)',
-    backdropFilter: 'blur(20px)',
+    // Fake glassmorphism - no backdrop-filter to prevent black background
+    background: `
+      linear-gradient(160deg, 
+        rgba(255, 255, 255, 0.15) 0%,
+        rgba(255, 255, 255, 0.10) 50%,
+        rgba(255, 255, 255, 0.12) 100%
+      ),
+      linear-gradient(20deg,
+        rgba(255, 255, 255, 0.18) 0%,
+        rgba(255, 255, 255, 0.20) 50%,
+        rgba(255, 255, 255, 0.19) 100%
+      )
+    `,
     textAlign: 'center',
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,

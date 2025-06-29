@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, BoxProps } from '@mantine/core';
-import { useGlassmorphism } from './GameRender';
 
 interface GlassProps extends BoxProps {
   children?: React.ReactNode;
@@ -8,8 +7,7 @@ interface GlassProps extends BoxProps {
 }
 
 const Glass: React.FC<GlassProps> = ({ children, onClick, ...props }) => {
-  // Use glassmorphism hook to show game background
-  useGlassmorphism();
+  // Note: Parent component should handle glassmorphism based on its visibility
   
   return (
     <Box

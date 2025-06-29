@@ -44,36 +44,57 @@ const useStyles = createStyles((theme, params: { canClose?: boolean }) => ({
     position: 'relative',
     overflow: 'hidden',
     fontFamily: 'Roboto',
-    // Modern glassmorphism background
     background: params.canClose === false 
-      ? 'rgba(255, 255, 255, 0.03)' 
-      : 'rgba(255, 255, 255, 0.08)',
-    border: `1px solid ${params.canClose === false 
-      ? 'rgba(255, 255, 255, 0.05)' 
-      : 'rgba(255, 255, 255, 0.15)'}`,
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
+      ? `
+        linear-gradient(160deg, 
+          rgba(255, 255, 255, 0.03) 0%,
+          rgba(255, 255, 255, 0.02) 50%,
+          rgba(255, 255, 255, 0.025) 100%
+        )
+      `
+      : `
+        linear-gradient(160deg, 
+          rgba(255, 255, 255, 0.12) 0%,
+          rgba(255, 255, 255, 0.08) 50%,
+          rgba(255, 255, 255, 0.10) 100%
+        ),
+        linear-gradient(20deg,
+          rgba(255, 255, 255, 0.15) 0%,
+          rgba(255, 255, 255, 0.18) 50%,
+          rgba(255, 255, 255, 0.16) 100%
+        )
+      `,
+    border: params.canClose === false 
+      ? '1px solid rgba(255, 255, 255, 0.1)' 
+      : '1px solid rgba(255, 255, 255, 0.18)',
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
     boxShadow: params.canClose === false 
       ? '0 2px 8px rgba(0, 0, 0, 0.1)' 
-      : '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+      : `
+        0 12px 40px rgba(0, 0, 0, 0.5),
+        0 6px 20px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+      `,
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     cursor: params.canClose === false ? 'not-allowed' : 'pointer',
     
     '&:hover': {
-      backgroundColor: params.canClose === false 
-        ? 'rgba(255, 255, 255, 0.03)' 
+      background: params.canClose === false 
+        ? 'rgba(255, 255, 255, 0.03)'
         : 'rgba(255, 255, 255, 0.12)',
       transform: params.canClose === false ? 'none' : 'translateY(-1px) scale(1.02)',
       boxShadow: params.canClose === false 
         ? '0 2px 8px rgba(0, 0, 0, 0.1)' 
-        : `0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 20px rgba(${theme.colors[theme.primaryColor][theme.fn.primaryShade()]
+        : `0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 15px rgba(${theme.colors[theme.primaryColor][theme.fn.primaryShade()]
           .replace('#', '')
           .match(/.{2}/g)
           ?.map(hex => parseInt(hex, 16))
-          .join(', ') || '239, 68, 68'}, 0.2)`,
+          .join(', ') || '239, 68, 68'}, 0.15)`,
       border: params.canClose === false 
         ? '1px solid rgba(255, 255, 255, 0.05)' 
-        : `1px solid rgba(255, 255, 255, 0.25)`,
+        : `1px solid ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}`,
       animation: params.canClose === false ? 'none' : `${hoverGlow} 2s ease-in-out infinite`,
     },
     
@@ -81,7 +102,6 @@ const useStyles = createStyles((theme, params: { canClose?: boolean }) => ({
       transform: params.canClose === false ? 'none' : 'translateY(0px) scale(0.98)',
     },
 
-    // Add subtle inner glow
     '&::before': {
       content: '""',
       position: 'absolute',
@@ -89,10 +109,11 @@ const useStyles = createStyles((theme, params: { canClose?: boolean }) => ({
       left: 0,
       right: 0,
       height: '50%',
-      background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent)',
+      background: 'transparent', 
       borderRadius: '8px 8px 0 0',
       pointerEvents: 'none',
-      opacity: params.canClose === false ? 0.3 : 1,
+      opacity: params.canClose === false ? 0.3 : 0.8,
+      zIndex: -1,
     },
   },
   root: {

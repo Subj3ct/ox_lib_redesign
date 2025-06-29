@@ -19,8 +19,19 @@ const useStyles = createStyles((theme) => ({
       textAlign: 'center',
       borderTopLeftRadius: 12,
       borderTopRightRadius: 12,
-      background: 'rgba(255, 255, 255, 0.1)',
-      backdropFilter: 'blur(20px)',
+      // Fake glassmorphism - no backdrop-filter to prevent black background
+      background: `
+        linear-gradient(160deg, 
+          rgba(255, 255, 255, 0.18) 0%,
+          rgba(255, 255, 255, 0.12) 50%,
+          rgba(255, 255, 255, 0.15) 100%
+        ),
+        linear-gradient(20deg,
+          rgba(255, 255, 255, 0.20) 0%,
+          rgba(255, 255, 255, 0.25) 50%,
+          rgba(255, 255, 255, 0.22) 100%
+        )
+      `,
       height: 60,
       width: 384,
       display: 'flex',
@@ -30,6 +41,22 @@ const useStyles = createStyles((theme) => ({
       borderBottom: 'none',
       boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
       overflow: 'hidden',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: `
+          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+          radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+          radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 40%)
+        `,
+        borderRadius: 'inherit',
+        zIndex: -1,
+        pointerEvents: 'none',
+      },
     },
     heading: {
       fontSize: 24,

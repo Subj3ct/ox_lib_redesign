@@ -28,12 +28,40 @@ const useStyles = createStyles((theme, params: { iconColor?: string; selected: b
 
   return {
     buttonContainer: {
+      // Fake glassmorphism - no backdrop-filter to prevent black background
       background: params.disabled 
-        ? 'rgba(255, 255, 255, 0.02)' 
+        ? `
+          linear-gradient(160deg, 
+            rgba(255, 255, 255, 0.03) 0%,
+            rgba(255, 255, 255, 0.02) 50%,
+            rgba(255, 255, 255, 0.025) 100%
+          )
+        `
         : params.selected 
-          ? 'rgba(255, 255, 255, 0.15)' 
-          : 'rgba(255, 255, 255, 0.08)',
-      backdropFilter: 'blur(10px)',
+          ? `
+            linear-gradient(160deg, 
+              rgba(255, 255, 255, 0.22) 0%,
+              rgba(255, 255, 255, 0.18) 50%,
+              rgba(255, 255, 255, 0.20) 100%
+            ),
+            linear-gradient(20deg,
+              rgba(255, 255, 255, 0.25) 0%,
+              rgba(255, 255, 255, 0.30) 50%,
+              rgba(255, 255, 255, 0.28) 100%
+            )
+          `
+          : `
+            linear-gradient(160deg, 
+              rgba(255, 255, 255, 0.12) 0%,
+              rgba(255, 255, 255, 0.08) 50%,
+              rgba(255, 255, 255, 0.10) 100%
+            ),
+            linear-gradient(20deg,
+              rgba(255, 255, 255, 0.15) 0%,
+              rgba(255, 255, 255, 0.18) 50%,
+              rgba(255, 255, 255, 0.16) 100%
+            )
+          `,
       border: params.disabled
         ? '1px solid rgba(255, 255, 255, 0.05)'
         : params.selected 
@@ -111,11 +139,11 @@ const useStyles = createStyles((theme, params: { iconColor?: string; selected: b
       overflowWrap: 'break-word',
     },
     descriptionText: {
-      color: params.disabled ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.7)',
+      color: params.disabled ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.85)',
       fontSize: 13,
       fontFamily: 'Roboto',
       fontWeight: 400,
-      textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
+      textShadow: '0 1px 3px rgba(0, 0, 0, 0.6)',
       lineHeight: 1.4,
       marginTop: 2,
       wordWrap: 'break-word',

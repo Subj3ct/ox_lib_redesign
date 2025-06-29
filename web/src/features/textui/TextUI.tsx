@@ -7,7 +7,6 @@ import remarkGfm from 'remark-gfm';
 import type { TextUiPosition, TextUiProps } from '../../typings';
 import MarkdownComponents from '../../config/MarkdownComponents';
 import LibIcon from '../../components/LibIcon';
-import { useGlassmorphism } from '../../components/GameRender';
 
 const breathe = keyframes({
   '0%, 100%': { 
@@ -77,16 +76,49 @@ const useStyles = createStyles((theme, params: { position?: TextUiPosition }) =>
     position: 'relative',
     overflow: 'hidden',
     fontFamily: 'Roboto',
-    background: 'rgba(255, 255, 255, 0.1)',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+    background: `
+      linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.25) 0%,
+        rgba(255, 255, 255, 0.18) 25%,
+        rgba(255, 255, 255, 0.12) 50%,
+        rgba(255, 255, 255, 0.08) 75%,
+        rgba(255, 255, 255, 0.15) 100%
+      ),
+      linear-gradient(45deg,
+        rgba(120, 120, 120, 0.4) 0%,
+        rgba(100, 100, 100, 0.5) 50%,
+        rgba(80, 80, 80, 0.6) 100%
+      )
+    `,
+    border: '1px solid rgba(255, 255, 255, 0.3)',
+    boxShadow: `
+      0 12px 40px rgba(0, 0, 0, 0.5),
+      0 6px 20px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+    `,
     borderRadius: '12px',
     padding: '16px 20px',
     minWidth: '200px',
     maxWidth: '400px',
     animation: `${breathe} 3s ease-in-out infinite`,
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: `
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 40%)
+      `,
+      borderRadius: 'inherit',
+      animation: `${breathe} 3s ease-in-out infinite`,
+      zIndex: -1,
+      pointerEvents: 'none',
+    },
   },
   containerEntering: {
     animation: `${slideInScale} 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, ${breathe} 3s ease-in-out infinite 0.6s`,
@@ -195,9 +227,6 @@ const TextUI: React.FC = () => {
   const [visible, setVisible] = React.useState(false);
   const { classes, cx } = useStyles({ position: data.position });
   
-  // Use glassmorphism hook to show game background
-  useGlassmorphism();
-
   useNuiEvent<TextUiProps>('textUi', (data) => {
     if (!data.position) data.position = 'right-center'; // Default right position
     setData(data);

@@ -5,7 +5,6 @@ import { useNuiEvent } from '../../../hooks/useNuiEvent';
 import { fetchNui } from '../../../utils/fetchNui';
 import { isIconUrl } from '../../../utils/isIconUrl';
 import ScaleFade from '../../../transitions/ScaleFade';
-import Glass from '../../../components/Glass';
 import type { RadialMenuItem } from '../../../typings';
 import { useLocales } from '../../../providers/LocaleProvider';
 import LibIcon from '../../../components/LibIcon';
@@ -27,6 +26,8 @@ const useStyles = createStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
     gap: 20,
+    // Transparent background to prevent GameRender black square from showing through
+    background: 'transparent',
   },
   radialContainer: {
     position: 'relative',
@@ -48,16 +49,66 @@ const useStyles = createStyles((theme) => ({
     cursor: 'pointer',
     transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
     borderRadius: 12,
-    // More visible default background with primary border
-    background: 'rgba(255, 255, 255, 0.12) !important',
-    border: `1px solid ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]} !important`,
-    backdropFilter: 'blur(20px) !important',
-    WebkitBackdropFilter: 'blur(20px) !important',
-    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important',
+    background: `
+      linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.25) 0%,
+        rgba(255, 255, 255, 0.18) 25%,
+        rgba(255, 255, 255, 0.12) 50%,
+        rgba(255, 255, 255, 0.08) 75%,
+        rgba(255, 255, 255, 0.15) 100%
+      ),
+      linear-gradient(45deg,
+        rgba(120, 120, 120, 0.4) 0%,
+        rgba(100, 100, 100, 0.5) 50%,
+        rgba(80, 80, 80, 0.6) 100%
+      )
+    `,
+    border: `1px solid ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}`,
+    // Enhanced shadows for depth without blur
+    boxShadow: `
+      0 12px 40px rgba(0, 0, 0, 0.5),
+      0 6px 20px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+    `,
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: `
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 40%)
+      `,
+      borderRadius: 'inherit',
+      zIndex: -1,
+      pointerEvents: 'none',
+    },
     '&:hover': {
       transform: 'scale(1.15)',
-      background: 'rgba(255, 255, 255, 0.2) !important',
-      boxShadow: `0 0 25px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, 0 8px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important`,
+      background: `
+        linear-gradient(135deg, 
+          rgba(255, 255, 255, 0.35) 0%,
+          rgba(255, 255, 255, 0.25) 25%,
+          rgba(255, 255, 255, 0.18) 50%,
+          rgba(255, 255, 255, 0.12) 75%,
+          rgba(255, 255, 255, 0.22) 100%
+        ),
+        linear-gradient(45deg,
+          rgba(120, 120, 120, 0.5) 0%,
+          rgba(100, 100, 100, 0.6) 50%,
+          rgba(80, 80, 80, 0.7) 100%
+        )
+      `,
+      boxShadow: `
+        0 0 25px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, 
+        0 12px 50px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.3)
+      `,
     },
   },
   menuItemContent: {
@@ -97,30 +148,58 @@ const useStyles = createStyles((theme) => ({
     textShadow: '0 1px 3px rgba(0, 0, 0, 0.8)',
     letterSpacing: '0.5px',
   },
-  centerCloseButton: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 70,
-    height: 70,
-    borderRadius: '50%',
-    background: 'rgba(20, 20, 20, 0.95)',
-    border: `3px solid ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}`,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    transition: 'all var(--anim-normal) var(--anim-easing)',
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
-    boxShadow: `0 0 20px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, 0 8px 25px rgba(0, 0, 0, 0.4)`,
-    '&:hover': {
-      background: theme.colors[theme.primaryColor][theme.fn.primaryShade()],
-      transform: 'translate(-50%, -50%) scale(1.1)',
-      boxShadow: `0 0 30px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, 0 12px 45px rgba(0, 0, 0, 0.6)`,
+      centerCloseButton: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: 70,
+      height: 70,
+      borderRadius: '50%',
+      // FAKE glassmorphism - NO backdrop-filter to prevent black square
+      background: `
+        linear-gradient(135deg, 
+          rgba(255, 255, 255, 0.25) 0%,
+          rgba(255, 255, 255, 0.18) 25%,
+          rgba(255, 255, 255, 0.12) 50%,
+          rgba(255, 255, 255, 0.08) 75%,
+          rgba(255, 255, 255, 0.15) 100%
+        ),
+        linear-gradient(45deg,
+          rgba(120, 120, 120, 0.4) 0%,
+          rgba(100, 100, 100, 0.5) 50%,
+          rgba(80, 80, 80, 0.6) 100%
+        )
+      `,
+      border: `3px solid ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}`,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      cursor: 'pointer',
+      transition: 'all var(--anim-normal) var(--anim-easing)',
+      boxShadow: `0 0 20px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, 0 8px 25px rgba(0, 0, 0, 0.4)`,
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: `
+          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+          radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+          radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 40%)
+        `,
+        borderRadius: 'inherit',
+        zIndex: -1,
+        pointerEvents: 'none',
+      },
+      '&:hover': {
+        background: theme.colors[theme.primaryColor][theme.fn.primaryShade()],
+        transform: 'translate(-50%, -50%) scale(1.1)',
+        boxShadow: `0 0 30px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, 0 12px 45px rgba(0, 0, 0, 0.6)`,
+      },
     },
-  },
   closeButtonContent: {
     display: 'flex',
     alignItems: 'center',
@@ -253,6 +332,19 @@ const RadialMenu: React.FC = () => {
     fetchNui('radialClose'); // Proper close event that handles focus
   };
 
+  // ESC key handler to close radial from any page/submenu
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && visible) {
+        event.preventDefault();
+        handleClose(); // Close immediately, bypassing back navigation
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [visible]);
+
   const handleRightClick = async () => {
     if (radialMenu.page > 1) await changePage();
     else if (radialMenu.sub) fetchNui('radialBack');
@@ -284,7 +376,7 @@ const RadialMenu: React.FC = () => {
             const position = getCircularPosition(index, menuItems.length);
             
             return (
-              <Glass
+              <Box
                 key={`radial-item-${index}`}
                 className={classes.menuItem}
                 style={{
@@ -316,7 +408,7 @@ const RadialMenu: React.FC = () => {
                     {item.label}
                   </Text>
                 </Box>
-              </Glass>
+              </Box>
             );
           })}
           

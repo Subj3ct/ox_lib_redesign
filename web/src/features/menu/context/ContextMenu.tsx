@@ -8,7 +8,6 @@ import ReactMarkdown from 'react-markdown';
 import HeaderButton from './components/HeaderButton';
 import ScaleFade from '../../../transitions/ScaleFade';
 import MarkdownComponents from '../../../config/MarkdownComponents';
-import { useGlassmorphism } from '../../../components/GameRender';
 
 const openMenu = (id: string | undefined) => {
   fetchNui<ContextMenuProps>('openContext', { id: id, back: true });
@@ -81,14 +80,44 @@ const useStyles = createStyles((theme) => ({
     height: 'fit-content', 
     maxHeight: '70vh', 
     fontFamily: 'Roboto',
-    background: 'rgba(255, 255, 255, 0.1)',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+    background: `
+      linear-gradient(160deg, 
+        rgba(255, 255, 255, 0.18) 0%,
+        rgba(255, 255, 255, 0.12) 50%,
+        rgba(255, 255, 255, 0.15) 100%
+      ),
+      linear-gradient(20deg,
+        rgba(255, 255, 255, 0.20) 0%,
+        rgba(255, 255, 255, 0.25) 50%,
+        rgba(255, 255, 255, 0.22) 100%
+      )
+    `,
+    border: '1px solid rgba(255, 255, 255, 0.18)',
+    boxShadow: `
+      0 12px 40px rgba(0, 0, 0, 0.5),
+      0 6px 20px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+    `,
     borderRadius: '12px',
     overflow: 'hidden',
     animation: 'none',
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: `
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 40%)
+      `,
+      borderRadius: 'inherit',
+      zIndex: -1,
+      pointerEvents: 'none',
+    },
   },
   containerEntering: {
     animation: `${slideInScale} 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards`,
@@ -109,13 +138,38 @@ const useStyles = createStyles((theme) => ({
   titleContainer: {
     borderRadius: '8px',
     flex: '1 85%',
-    background: 'rgba(255, 255, 255, 0.08)',
-    border: '1px solid rgba(255, 255, 255, 0.15)',
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
+    background: `
+      linear-gradient(160deg, 
+        rgba(255, 255, 255, 0.18) 0%,
+        rgba(255, 255, 255, 0.12) 50%,
+        rgba(255, 255, 255, 0.15) 100%
+      ),
+      linear-gradient(20deg,
+        rgba(255, 255, 255, 0.20) 0%,
+        rgba(255, 255, 255, 0.25) 50%,
+        rgba(255, 255, 255, 0.22) 100%
+      )
+    `,
+    border: '1px solid rgba(255, 255, 255, 0.18)',
     position: 'relative',
     overflow: 'hidden',
-    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: `
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 40%)
+      `,
+      borderRadius: 'inherit',
+      zIndex: -1,
+      pointerEvents: 'none',
+    },
   },
   titleText: {
     color: '#ffffff',
@@ -200,11 +254,7 @@ const useStyles = createStyles((theme) => ({
     right: 0,
     bottom: 0,
     borderRadius: '12px',
-    background: `radial-gradient(circle at 50% 0%, rgba(${theme.colors[theme.primaryColor][theme.fn.primaryShade()]
-      .replace('#', '')
-      .match(/.{2}/g)
-      ?.map(hex => parseInt(hex, 16))
-      .join(', ') || '239, 68, 68'}, 0.1), transparent 70%)`,
+    background: 'radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.02), transparent 60%)',
     pointerEvents: 'none',
     zIndex: 1,
   },
@@ -215,16 +265,16 @@ const ContextMenu: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [isEntering, setIsEntering] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+  const [forceCloseHoverCards, setForceCloseHoverCards] = useState(0);
   const [contextMenu, setContextMenu] = useState<ContextMenuProps>({
     title: '',
     options: { '': { description: '', metadata: [] } },
   });
 
-  // Use glassmorphism hook to show game background
-  useGlassmorphism();
-
   const closeContext = () => {
     if (contextMenu.canClose === false) return;
+    // Force close all hover cards before closing menu
+    setForceCloseHoverCards(prev => prev + 1);
     setIsExiting(true);
     setTimeout(() => {
     setVisible(false);
@@ -247,6 +297,8 @@ const ContextMenu: React.FC = () => {
   }, [visible]);
 
   useNuiEvent('hideContext', () => {
+    // Force close all hover cards before closing menu
+    setForceCloseHoverCards(prev => prev + 1);
     setIsExiting(true);
     setTimeout(() => {
       setVisible(false);
@@ -260,10 +312,11 @@ const ContextMenu: React.FC = () => {
       await new Promise((resolve) => setTimeout(resolve, 400));
       setIsExiting(false); // CRITICAL: Reset exit state before showing new menu
     }
+    
     setContextMenu(data);
     setVisible(true);
     setIsEntering(true);
-    setTimeout(() => setIsEntering(false), 800); 
+    setTimeout(() => setIsEntering(false), 800);
   });
 
   return (
@@ -295,7 +348,7 @@ const ContextMenu: React.FC = () => {
         <Box className={classes.buttonsWrapper}>
           <Stack className={classes.buttonsFlexWrapper} pb={16}>
             {Object.entries(contextMenu.options).map((option, index) => (
-              <ContextButton option={option} key={`context-item-${index}`} />
+              <ContextButton option={option} key={`context-item-${index}`} forceCloseHoverCards={forceCloseHoverCards} />
             ))}
           </Stack>
         </Box>

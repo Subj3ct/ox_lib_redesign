@@ -6,6 +6,7 @@ import { isIconUrl } from '../../../../utils/isIconUrl';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import MarkdownComponents from '../../../../config/MarkdownComponents';
 import LibIcon from '../../../../components/LibIcon';
+import React from 'react';
 
 const openMenu = (id: string | undefined) => {
   fetchNui<ContextMenuProps>('openContext', { id: id, back: false });
@@ -15,7 +16,6 @@ const clickContext = (id: string) => {
   fetchNui('clickContext', id);
 };
 
-// Enhanced continuous glow animation for hover effects
 const hoverGlow = keyframes({
   '0%, 100%': {
     opacity: 0.2,
@@ -63,69 +63,104 @@ const useStyles = createStyles((theme, params: { disabled?: boolean; readOnly?: 
   button: {
     height: 'fit-content',
     width: '100%',
-      padding: 12,
-      position: 'relative',
-      overflow: 'hidden',
-      fontFamily: 'Roboto',
+    padding: 12,
+    position: 'relative',
+    overflow: 'hidden',
+    fontFamily: 'Roboto',
+    background: params.disabled 
+      ? `
+        linear-gradient(160deg, 
+          rgba(255, 255, 255, 0.03) 0%,
+          rgba(255, 255, 255, 0.02) 50%,
+          rgba(255, 255, 255, 0.025) 100%
+        )
+      `
+      : params.readOnly 
+        ? `
+          linear-gradient(160deg, 
+            rgba(255, 255, 255, 0.12) 0%,
+            rgba(255, 255, 255, 0.08) 50%,
+            rgba(255, 255, 255, 0.10) 100%
+          ),
+          linear-gradient(20deg,
+            rgba(255, 255, 255, 0.15) 0%,
+            rgba(255, 255, 255, 0.18) 50%,
+            rgba(255, 255, 255, 0.16) 100%
+          )
+        `
+        : `
+          linear-gradient(160deg, 
+            rgba(255, 255, 255, 0.12) 0%,
+            rgba(255, 255, 255, 0.08) 50%,
+            rgba(255, 255, 255, 0.10) 100%
+          ),
+          linear-gradient(20deg,
+            rgba(255, 255, 255, 0.15) 0%,
+            rgba(255, 255, 255, 0.18) 50%,
+            rgba(255, 255, 255, 0.16) 100%
+          )
+        `,
+    border: params.disabled 
+      ? '1px solid rgba(255, 255, 255, 0.1)' 
+      : '1px solid rgba(255, 255, 255, 0.18)',
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
+    boxShadow: params.disabled 
+      ? '0 2px 8px rgba(0, 0, 0, 0.1)' 
+      : `
+        0 8px 24px rgba(0, 0, 0, 0.25),
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+      `,
+    borderRadius: '8px',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    cursor: params.disabled ? 'not-allowed' : params.readOnly ? 'default' : 'pointer',
+    animation: 'none !important',
+    transform: 'none',
+    
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: '50%',
+      background: 'transparent', 
+      borderRadius: '8px 8px 0 0',
+      pointerEvents: 'none',
+      opacity: params.disabled ? 0.3 : 0.7,
+      zIndex: -1,
+    },
+    
+    '&:hover': {
       background: params.disabled 
         ? 'rgba(255, 255, 255, 0.02)' 
         : params.readOnly 
-          ? 'rgba(255, 255, 255, 0.03)'
-          : 'rgba(255, 255, 255, 0.05)', 
-      border: `1px solid ${params.disabled 
-        ? 'rgba(255, 255, 255, 0.05)' 
-        : 'rgba(255, 255, 255, 0.1)'}`, 
-      backdropFilter: 'blur(10px)',
-      WebkitBackdropFilter: 'blur(10px)',
+          ? 'rgba(255, 255, 255, 0.05)'
+          : 'rgba(255, 255, 255, 0.12)', 
+      transform: params.disabled || params.readOnly ? 'none' : 'translateY(-1px)',
       boxShadow: params.disabled 
         ? '0 2px 8px rgba(0, 0, 0, 0.1)' 
-        : '0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08)', // Reduced shadow opacity
-      borderRadius: '8px',
-      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      cursor: params.disabled ? 'not-allowed' : params.readOnly ? 'default' : 'pointer',
-      animation: 'none !important',
-      transform: 'none',
+        : params.readOnly
+          ? '0 2px 12px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.06)'
+          : `0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 12px rgba(${buttonColorRgb}, 0.12), inset 0 0 0 1px ${buttonColor}`,
+      border: params.disabled 
+        ? '1px solid rgba(255, 255, 255, 0.05)' 
+        : params.readOnly
+          ? '1px solid rgba(255, 255, 255, 0.1)'
+          : `1px solid ${params.colorScheme 
+              ? (theme.colors[params.colorScheme]?.[theme.fn.primaryShade()] || theme.colors[params.colorScheme]?.[8] || params.colorScheme)
+              : theme.colors[theme.primaryColor][theme.fn.primaryShade()]}`, 
+      animation: params.disabled || params.readOnly ? 'none' : `${hoverGlow} 2s ease-in-out infinite`,
       
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '50%',
-        background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent)',
-        borderRadius: '8px 8px 0 0',
-        pointerEvents: 'none',
-        opacity: params.disabled ? 0.2 : 0.8,
-        zIndex: 1,
+      '& .mantine-Text-root': {
+        transform: 'none',
       },
-      
-    '&:hover': {
-        backgroundColor: params.disabled 
-          ? 'rgba(255, 255, 255, 0.02)' 
-          : params.readOnly 
-            ? 'rgba(255, 255, 255, 0.03)'
-            : 'rgba(255, 255, 255, 0.12)', 
-        transform: params.disabled || params.readOnly ? 'none' : 'translateY(-1px)',
-        boxShadow: params.disabled 
-          ? '0 2px 8px rgba(0, 0, 0, 0.1)' 
-          : params.readOnly
-            ? '0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08)'
-            : `0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 20px rgba(${buttonColorRgb}, 0.2), inset 0 0 0 1px ${buttonColor}`, // Use item-specific color
-        border: params.disabled 
-          ? '1px solid rgba(255, 255, 255, 0.05)' 
-          : params.readOnly
-            ? '1px solid rgba(255, 255, 255, 0.1)'
-            : '1px solid rgba(255, 255, 255, 0.25)', 
-        animation: params.disabled || params.readOnly ? 'none' : `${hoverGlow} 2s ease-in-out infinite`,
-        
-        '& .mantine-Text-root': {
-          transform: 'none', // Remove scaling to prevent text cutoff
-        },
     },
-      
+    
     '&:active': {
-        transform: params.disabled || params.readOnly ? 'none' : 'translateY(0px) scale(0.98)',
+      transform: params.disabled || params.readOnly ? 'none' : 'translateY(0px) scale(0.98)',
     },
   },
   iconImage: {
@@ -134,11 +169,11 @@ const useStyles = createStyles((theme, params: { disabled?: boolean; readOnly?: 
       filter: params.disabled ? 'grayscale(100%) opacity(0.4)' : 'none',
   },
   description: {
-      color: params.disabled ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.75)',
+      color: params.disabled ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.85)',
       fontSize: '13px',
       fontFamily: 'Roboto',
       lineHeight: 1.4,
-      textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+      textShadow: '0 1px 3px rgba(0, 0, 0, 0.6)',
       transition: 'all 0.2s ease', 
       backdropFilter: 'none',
       WebkitBackdropFilter: 'none',
@@ -161,28 +196,34 @@ const useStyles = createStyles((theme, params: { disabled?: boolean; readOnly?: 
       },
   },
   dropdown: {
-      padding: 16,
-      color: '#ffffff',
-      fontSize: '14px',
-      maxWidth: 280,
+    padding: 16,
+    color: '#ffffff',
+    fontSize: '14px',
+    maxWidth: 280,
     width: 'fit-content',
-      fontFamily: 'Roboto',
-      background: 'rgba(255, 255, 255, 0.1)',
-      borderStyle: 'solid',
-      borderWidth: '1px',
-      borderColor: 'rgba(255, 255, 255, 0.2)',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-      borderRadius: '8px',
-      '& p': {
-        margin: '0 0 8px 0',
-        backdropFilter: 'none',
-        WebkitBackdropFilter: 'none',
-        '&:last-child': {
-          marginBottom: 0,
-        },
+    fontFamily: 'Roboto',
+    background: `
+      linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(255, 255, 255, 0.06) 100%
+      )
+    `,
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+    borderRadius: '8px',
+    '& p': {
+      margin: '0 0 8px 0',
+      backdropFilter: 'none',
+      WebkitBackdropFilter: 'none',
+      '&:last-child': {
+        marginBottom: 0,
       },
+    },
   },
   buttonStack: {
       gap: 6,
@@ -246,11 +287,10 @@ const useStyles = createStyles((theme, params: { disabled?: boolean; readOnly?: 
     justifyContent: 'center',
     alignItems: 'center',
       borderRadius: '4px',
-      background: 'rgba(255, 255, 255, 0.06)', // Reduced opacity to match other elements
-      border: '1px solid rgba(255, 255, 255, 0.1)', // Reduced border opacity
+      background: 'rgba(255, 255, 255, 0.06)', 
+      border: '1px solid rgba(255, 255, 255, 0.1)', 
       opacity: params.disabled ? 0.4 : 1,
       transition: 'all 0.3s ease',
-      // Remove any animations completely
       animation: 'none !important',
       transform: 'none',
     },
@@ -293,7 +333,8 @@ const useStyles = createStyles((theme, params: { disabled?: boolean; readOnly?: 
 
 const ContextButton: React.FC<{
   option: [string, Option];
-}> = ({ option }) => {
+  forceCloseHoverCards?: number;
+}> = ({ option, forceCloseHoverCards }) => {
   const button = option[1];
   const buttonKey = option[0];
   const { classes } = useStyles({ disabled: button.disabled, readOnly: button.readOnly, colorScheme: button.colorScheme });
@@ -301,12 +342,13 @@ const ContextButton: React.FC<{
   return (
     <>
       <HoverCard
+        key={`hovercard-${buttonKey}-${forceCloseHoverCards || 0}`}
         position="right-start"
         disabled={button.disabled || !(button.metadata || button.image)}
-        openDelay={200}
-        closeDelay={100}
+        openDelay={150}
+        closeDelay={0}
         transition="fade"
-        transitionDuration={200}
+        transitionDuration={100}
         withinPortal
       >
         <HoverCard.Target>

@@ -7,7 +7,7 @@ import { useLocales } from '../../providers/LocaleProvider';
 import remarkGfm from 'remark-gfm';
 import type { AlertProps } from '../../typings';
 import MarkdownComponents from '../../config/MarkdownComponents';
-import { useGlassmorphism } from '../../components/GameRender';
+import { useConditionalGlassmorphism } from '../../components/GameRender';
 
 const breathe = keyframes({
   '0%, 100%': { 
@@ -250,16 +250,19 @@ const AlertDialog: React.FC = () => {
   const { classes, cx } = useStyles();
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
+  const [preWarm, setPreWarm] = useState(false); // Pre-warm glassmorphism
   const [isExiting, setIsExiting] = useState(false);
   const [dialogData, setDialogData] = useState<AlertProps>({
     header: '',
     content: '',
   });
 
-  useGlassmorphism();
+  // Enable glassmorphism when alert dialog is visible OR pre-warming
+  useConditionalGlassmorphism(opened || preWarm, 'AlertDialog');
 
   const closeAlert = (button: string) => {
     setIsExiting(true);
+    setPreWarm(false); // Stop pre-warming
     fetchNui('closeAlert', button);
     setTimeout(() => {
       setOpened(false);
@@ -268,13 +271,21 @@ const AlertDialog: React.FC = () => {
   };
 
   useNuiEvent('sendAlert', (data: AlertProps) => {
+    // Pre-warm glassmorphism for instant canvas availability
+    setPreWarm(true);
     setDialogData(data);
-    setOpened(true);
     setIsExiting(false);
+    
+    // Small delay to ensure canvas is ready, then show alert
+    setTimeout(() => {
+      setOpened(true);
+      setPreWarm(false); // Stop pre-warming, opened takes over
+    }, 50); // 50ms pre-warm for instant appearance
   });
 
   useNuiEvent('closeAlertDialog', () => {
     setIsExiting(true);
+    setPreWarm(false); // Stop pre-warming
     setTimeout(() => {
       setOpened(false);
       setIsExiting(false);
