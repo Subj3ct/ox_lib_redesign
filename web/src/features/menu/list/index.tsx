@@ -7,6 +7,7 @@ import FocusTrap from 'focus-trap-react';
 import { fetchNui } from '../../../utils/fetchNui';
 import type { MenuPosition, MenuSettings } from '../../../typings';
 import LibIcon from '../../../components/LibIcon';
+import { useGlassStyle } from '../../../hooks/useGlassStyle';
 
 const slideInScale = keyframes({
   '0%': {
@@ -28,10 +29,23 @@ const breathe = keyframes({
   },
 });
 
-const useStyles = createStyles((theme, params: { position?: MenuPosition; itemCount: number; selected: number }) => ({
+const useStyles = createStyles((theme, params: { position?: MenuPosition; itemCount: number; selected: number; glass: ReturnType<typeof useGlassStyle> }) => ({
   tooltip: {
     // Fake glassmorphism - no backdrop-filter to prevent black background
-    background: `
+    background: params.glass.isDarkMode ? `
+      linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.25) 0%,
+        rgba(0, 0, 0, 0.18) 25%,
+        rgba(0, 0, 0, 0.12) 50%,
+        rgba(0, 0, 0, 0.08) 75%,
+        rgba(0, 0, 0, 0.15) 100%
+      ),
+      linear-gradient(45deg,
+        rgba(20, 20, 20, 0.4) 0%,
+        rgba(10, 10, 10, 0.5) 50%,
+        rgba(0, 0, 0, 0.6) 100%
+      )
+    ` : `
       linear-gradient(160deg, 
         rgba(255, 255, 255, 0.18) 0%,
         rgba(255, 255, 255, 0.12) 50%,
@@ -43,16 +57,17 @@ const useStyles = createStyles((theme, params: { position?: MenuPosition; itemCo
         rgba(255, 255, 255, 0.22) 100%
       )
     `,
-    border: '1px solid rgba(255, 255, 255, 0.2)',
+    border: `1px solid ${params.glass.isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.2)'}`,
     borderRadius: 12,
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+    boxShadow: params.glass.isDarkMode ? 
+      '0 12px 40px rgba(0, 0, 0, 0.7), 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1)' :
+      '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
     color: '#ffffff',
     maxWidth: 350,
     whiteSpace: 'normal',
     fontFamily: 'Roboto',
     fontSize: 14,
     fontWeight: 400,
-    textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
   },
   container: {
     position: 'absolute',
@@ -67,7 +82,20 @@ const useStyles = createStyles((theme, params: { position?: MenuPosition; itemCo
     fontFamily: 'Roboto',
     width: 384,
     // Fake glassmorphism - no backdrop-filter to prevent black background
-    background: `
+    background: params.glass.isDarkMode ? `
+      linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.25) 0%,
+        rgba(0, 0, 0, 0.18) 25%,
+        rgba(0, 0, 0, 0.12) 50%,
+        rgba(0, 0, 0, 0.08) 75%,
+        rgba(0, 0, 0, 0.15) 100%
+      ),
+      linear-gradient(45deg,
+        rgba(20, 20, 20, 0.4) 0%,
+        rgba(10, 10, 10, 0.5) 50%,
+        rgba(0, 0, 0, 0.6) 100%
+      )
+    ` : `
       linear-gradient(160deg, 
         rgba(255, 255, 255, 0.18) 0%,
         rgba(255, 255, 255, 0.12) 50%,
@@ -79,9 +107,14 @@ const useStyles = createStyles((theme, params: { position?: MenuPosition; itemCo
         rgba(255, 255, 255, 0.22) 100%
       )
     `,
-    border: '1px solid rgba(255, 255, 255, 0.2)',
+    border: `1px solid ${params.glass.isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.2)'}`,
     borderRadius: 12,
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+    boxShadow: params.glass.isDarkMode ? `
+      0 12px 40px rgba(0, 0, 0, 0.7),
+      0 6px 20px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.4)
+    ` : '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
     animation: `${slideInScale} 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), ${breathe} 4s ease-in-out infinite`,
     overflow: 'hidden',
     '&::before': {
@@ -91,7 +124,11 @@ const useStyles = createStyles((theme, params: { position?: MenuPosition; itemCo
       left: 0,
       right: 0,
       bottom: 0,
-      background: `
+      background: params.glass.isDarkMode ? `
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 40%)
+      ` : `
         radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
         radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
         radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 40%)
@@ -108,6 +145,7 @@ const useStyles = createStyles((theme, params: { position?: MenuPosition; itemCo
     borderTopRightRadius: 0,
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: params.itemCount <= 6 || params.selected === params.itemCount - 1 ? 12 : 0,
+    // Fake glassmorphism - lighter overlay without backdrop-filter
     background: `
       linear-gradient(160deg, 
         rgba(255, 255, 255, 0.08) 0%,
@@ -123,7 +161,20 @@ const useStyles = createStyles((theme, params: { position?: MenuPosition; itemCo
   },
   scrollArrow: {
     // Fake glassmorphism - no backdrop-filter to prevent black background
-    background: `
+    background: params.glass.isDarkMode ? `
+      linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.25) 0%,
+        rgba(0, 0, 0, 0.18) 25%,
+        rgba(0, 0, 0, 0.12) 50%,
+        rgba(0, 0, 0, 0.08) 75%,
+        rgba(0, 0, 0, 0.15) 100%
+      ),
+      linear-gradient(45deg,
+        rgba(20, 20, 20, 0.4) 0%,
+        rgba(10, 10, 10, 0.5) 50%,
+        rgba(0, 0, 0, 0.6) 100%
+      )
+    ` : `
       linear-gradient(160deg, 
         rgba(255, 255, 255, 0.15) 0%,
         rgba(255, 255, 255, 0.10) 50%,
@@ -139,11 +190,14 @@ const useStyles = createStyles((theme, params: { position?: MenuPosition; itemCo
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
     height: 25,
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    border: `1px solid ${params.glass.isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.1)'}`,
     borderTop: 'none',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    boxShadow: params.glass.isDarkMode ? 
+      '0 12px 40px rgba(0, 0, 0, 0.7), 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1)' :
+      '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
   },
   scrollArrowIcon: {
     color: '#ffffff',
@@ -164,7 +218,8 @@ const ListMenu: React.FC = () => {
   const [checkedStates, setCheckedStates] = useState<Record<number, boolean>>({});
   const listRefs = useRef<Array<HTMLDivElement | null>>([]);
   const firstRenderRef = useRef(false);
-  const { classes } = useStyles({ position: menu.position, itemCount: menu.items.length, selected });
+  const glass = useGlassStyle();
+  const { classes } = useStyles({ position: menu.position, itemCount: menu.items.length, selected, glass });
 
   const closeMenu = (ignoreFetch?: boolean, keyPressed?: string, forceClose?: boolean) => {
     if (menu.canClose === false && !forceClose) return;

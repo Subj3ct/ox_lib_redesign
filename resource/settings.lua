@@ -22,7 +22,8 @@ end
 local settings = {
     default_locale = GetConvar('ox:locale', 'en'),
     notification_position = safeGetKvp(GetResourceKvpString, 'notification_position', 'top-right'),
-    notification_audio = safeGetKvp(GetResourceKvpInt, 'notification_audio') == 1
+    notification_audio = safeGetKvp(GetResourceKvpInt, 'notification_audio') == 1,
+    dark_mode = safeGetKvp(GetResourceKvpInt, 'dark_mode', GetConvarInt('ox:darkMode', 0)) == 1
 }
 
 local userLocales = GetConvarInt('ox:userLocales', 1) == 1
@@ -58,6 +59,12 @@ RegisterCommand('ox_lib', function()
             type = 'checkbox',
             label = locale('ui.settings.notification_audio'),
             checked = settings.notification_audio,
+        },
+        {
+            type = 'checkbox',
+            label = 'Dark Mode',
+            description = 'Enable dark mode for ox_lib UI components',
+            checked = settings.dark_mode,
         },
         {
             type = 'select',
@@ -96,13 +103,24 @@ RegisterCommand('ox_lib', function()
 
     if not input then return end
 
-    ---@type boolean, string, string
-    local notification_audio, notification_position, locale = table.unpack(input)
+    ---@type boolean, boolean, string, string
+    local notification_audio, dark_mode, notification_position, locale = table.unpack(input)
 
     if userLocales and set('locale', locale) then lib.setLocale(locale) end
 
     set('notification_position', notification_position)
     set('notification_audio', notification_audio)
+    set('dark_mode', dark_mode)
+    
+    -- Always refresh NUI config after settings change
+    SendNUIMessage({
+        action = 'refreshConfig',
+        data = {
+            primaryColor = GetConvar('ox:primaryColor', 'red'),
+            primaryShade = GetConvarInt('ox:primaryShade', 8),
+            darkMode = dark_mode  -- Use the new value directly
+        }
+    })
 end)
 
 return settings

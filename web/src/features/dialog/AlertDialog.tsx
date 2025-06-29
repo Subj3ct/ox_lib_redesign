@@ -8,6 +8,8 @@ import remarkGfm from 'remark-gfm';
 import type { AlertProps } from '../../typings';
 import MarkdownComponents from '../../config/MarkdownComponents';
 import { useConditionalGlassmorphism } from '../../components/GameRender';
+import { useGlassStyle } from '../../hooks/useGlassStyle';
+import type { GlassStyle } from '../../hooks/useGlassStyle';
 
 const breathe = keyframes({
   '0%, 100%': { 
@@ -60,10 +62,10 @@ const slideOutScale = keyframes({
   },
 });
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => ({
   overlay: {
     '& .mantine-Modal-overlay': {
-      backgroundColor: 'rgba(0, 0, 0, 0.4)',
+      backgroundColor: glass.isDarkMode ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.4)',
       backdropFilter: 'blur(4px)',
       WebkitBackdropFilter: 'blur(4px)',
     },
@@ -75,11 +77,29 @@ const useStyles = createStyles((theme) => ({
     position: 'relative',
     overflow: 'hidden',
     fontFamily: 'Roboto',
-    background: 'rgba(255, 255, 255, 0.1)',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+    background: glass.isDarkMode ? `
+      linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.25) 0%,
+        rgba(0, 0, 0, 0.18) 25%,
+        rgba(0, 0, 0, 0.12) 50%,
+        rgba(0, 0, 0, 0.08) 75%,
+        rgba(0, 0, 0, 0.15) 100%
+      ),
+      linear-gradient(45deg,
+        rgba(20, 20, 20, 0.4) 0%,
+        rgba(10, 10, 10, 0.5) 50%,
+        rgba(0, 0, 0, 0.6) 100%
+      )
+    ` : 'rgba(255, 255, 255, 0.1)',
+    border: `1px solid ${glass.isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.2)'}`,
+    backdropFilter: glass.isDarkMode ? undefined : 'blur(20px)',
+    WebkitBackdropFilter: glass.isDarkMode ? undefined : 'blur(20px)',
+    boxShadow: glass.isDarkMode ? `
+      0 12px 40px rgba(0, 0, 0, 0.7),
+      0 6px 20px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.4)
+    ` : '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
     borderRadius: '12px',
     '&::before': {
       content: '""',
@@ -88,7 +108,11 @@ const useStyles = createStyles((theme) => ({
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'inherit',
+      background: glass.isDarkMode ? `
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 40%)
+      ` : 'inherit',
       borderRadius: 'inherit',
       animation: `${breathe} 3s ease-in-out infinite`,
       zIndex: -1,
@@ -200,16 +224,20 @@ const useStyles = createStyles((theme) => ({
     },
   },
   cancelButton: {
-    background: 'rgba(255, 255, 255, 0.1)',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
+    background: glass.isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.1)',
+    border: `1px solid ${glass.isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.2)'}`,
     color: 'rgba(255, 255, 255, 0.9)',
     textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+    boxShadow: glass.isDarkMode ? 
+      '0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08)' :
+      '0 2px 8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
     '&:hover': {
-      background: 'rgba(255, 255, 255, 0.15)',
-      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+      background: glass.isDarkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.15)',
+      boxShadow: glass.isDarkMode ?
+        '0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12)' :
+        '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
       color: '#ffffff',
       transform: 'translateY(-1px)',
     },
@@ -229,16 +257,20 @@ const useStyles = createStyles((theme) => ({
     },
   },
   singleButton: {
-    background: 'rgba(255, 255, 255, 0.12)',
-    border: '1px solid rgba(255, 255, 255, 0.25)',
+    background: glass.isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.12)',
+    border: `1px solid ${glass.isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.25)'}`,
     color: '#ffffff',
     textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+    boxShadow: glass.isDarkMode ?
+      '0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08)' :
+      '0 2px 8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
     '&:hover': {
-      background: 'rgba(255, 255, 255, 0.18)',
-      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+      background: glass.isDarkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.18)',
+      boxShadow: glass.isDarkMode ?
+        '0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12)' :
+        '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
       color: '#ffffff',
       transform: 'translateY(-1px)',
     },
@@ -247,7 +279,8 @@ const useStyles = createStyles((theme) => ({
 
 const AlertDialog: React.FC = () => {
   const { locale } = useLocales();
-  const { classes, cx } = useStyles();
+  const glass = useGlassStyle();
+  const { classes, cx } = useStyles({ glass });
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
   const [preWarm, setPreWarm] = useState(false); // Pre-warm glassmorphism

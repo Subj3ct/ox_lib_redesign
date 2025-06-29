@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import HeaderButton from './components/HeaderButton';
 import ScaleFade from '../../../transitions/ScaleFade';
 import MarkdownComponents from '../../../config/MarkdownComponents';
+import { useGlassStyle } from '../../../hooks/useGlassStyle';
 
 const openMenu = (id: string | undefined) => {
   fetchNui<ContextMenuProps>('openContext', { id: id, back: true });
@@ -71,7 +72,7 @@ const scrollGlow = keyframes({
   },
 });
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((theme, { glassStyle }: { glassStyle: any }) => ({
   container: {
     position: 'absolute',
     top: '15%',
@@ -80,25 +81,9 @@ const useStyles = createStyles((theme) => ({
     height: 'fit-content', 
     maxHeight: '70vh', 
     fontFamily: 'Roboto',
-    background: `
-      linear-gradient(160deg, 
-        rgba(255, 255, 255, 0.18) 0%,
-        rgba(255, 255, 255, 0.12) 50%,
-        rgba(255, 255, 255, 0.15) 100%
-      ),
-      linear-gradient(20deg,
-        rgba(255, 255, 255, 0.20) 0%,
-        rgba(255, 255, 255, 0.25) 50%,
-        rgba(255, 255, 255, 0.22) 100%
-      )
-    `,
-    border: '1px solid rgba(255, 255, 255, 0.18)',
-    boxShadow: `
-      0 12px 40px rgba(0, 0, 0, 0.5),
-      0 6px 20px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.2)
-    `,
+    background: glassStyle.mainBackground,
+    border: `1px solid ${glassStyle.border}`,
+    boxShadow: glassStyle.shadow,
     borderRadius: '12px',
     overflow: 'hidden',
     animation: 'none',
@@ -109,11 +94,7 @@ const useStyles = createStyles((theme) => ({
       left: 0,
       right: 0,
       bottom: 0,
-      background: `
-        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 40%)
-      `,
+      background: glassStyle.textureOverlay,
       borderRadius: 'inherit',
       zIndex: -1,
       pointerEvents: 'none',
@@ -138,19 +119,8 @@ const useStyles = createStyles((theme) => ({
   titleContainer: {
     borderRadius: '8px',
     flex: '1 85%',
-    background: `
-      linear-gradient(160deg, 
-        rgba(255, 255, 255, 0.18) 0%,
-        rgba(255, 255, 255, 0.12) 50%,
-        rgba(255, 255, 255, 0.15) 100%
-      ),
-      linear-gradient(20deg,
-        rgba(255, 255, 255, 0.20) 0%,
-        rgba(255, 255, 255, 0.25) 50%,
-        rgba(255, 255, 255, 0.22) 100%
-      )
-    `,
-    border: '1px solid rgba(255, 255, 255, 0.18)',
+    background: glassStyle.mainBackground,
+    border: `1px solid ${glassStyle.border}`,
     position: 'relative',
     overflow: 'hidden',
     boxShadow: '0 2px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
@@ -161,11 +131,7 @@ const useStyles = createStyles((theme) => ({
       left: 0,
       right: 0,
       bottom: 0,
-      background: `
-        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
-        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 40%)
-      `,
+      background: glassStyle.textureOverlay,
       borderRadius: 'inherit',
       zIndex: -1,
       pointerEvents: 'none',
@@ -209,7 +175,7 @@ const useStyles = createStyles((theme) => ({
   buttonsContainer: {
     height: 'fit-content', 
     maxHeight: '50vh', 
-    padding: '0 16px 0 16px',
+    padding: '0 8px 0 8px',
     position: 'relative',
     background: 'transparent',
     backdropFilter: 'none',
@@ -221,6 +187,9 @@ const useStyles = createStyles((theme) => ({
     overflowY: 'auto',
     overflowX: 'hidden',
     paddingRight: '4px', 
+    paddingLeft: '4px',
+    paddingBottom: '4px',
+    paddingTop: '4px',
     background: 'transparent',
     backdropFilter: 'none',
     WebkitBackdropFilter: 'none',
@@ -261,7 +230,8 @@ const useStyles = createStyles((theme) => ({
 }));
 
 const ContextMenu: React.FC = () => {
-  const { classes, cx } = useStyles();
+  const glassStyle = useGlassStyle();
+  const { classes, cx } = useStyles({ glassStyle });
   const [visible, setVisible] = useState(false);
   const [isEntering, setIsEntering] = useState(false);
   const [isExiting, setIsExiting] = useState(false);

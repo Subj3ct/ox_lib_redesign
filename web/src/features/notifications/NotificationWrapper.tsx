@@ -8,6 +8,7 @@ import type { NotificationProps } from '../../typings';
 import MarkdownComponents from '../../config/MarkdownComponents';
 import LibIcon from '../../components/LibIcon';
 import Glass from '../../components/Glass';
+import { useGlassStyle } from '../../hooks/useGlassStyle';
 
 const breathe = keyframes({
   '0%, 100%': { 
@@ -46,7 +47,7 @@ const slideOutScale = keyframes({
   },
 });
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((theme, { glassStyle }: { glassStyle: any }) => ({
   container: {
     width: 350,
     height: 'fit-content',
@@ -55,28 +56,10 @@ const useStyles = createStyles((theme) => ({
     position: 'relative',
     overflow: 'hidden',
     fontFamily: 'Roboto',
-    background: `
-      linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.25) 0%,
-        rgba(255, 255, 255, 0.18) 25%,
-        rgba(255, 255, 255, 0.12) 50%,
-        rgba(255, 255, 255, 0.08) 75%,
-        rgba(255, 255, 255, 0.15) 100%
-      ),
-      linear-gradient(45deg,
-        rgba(100, 100, 100, 0.4) 0%,
-        rgba(80, 80, 80, 0.5) 50%,
-        rgba(60, 60, 60, 0.6) 100%
-      )
-    `,
-    border: '1px solid rgba(255, 255, 255, 0.3)',
+    background: glassStyle.mainBackground,
+    border: `1px solid ${glassStyle.border}`,
     borderRadius: '12px',
-    boxShadow: `
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      0 4px 16px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.2)
-    `,
+    boxShadow: glassStyle.shadow,
     animation: `${breathe} 3s ease-in-out infinite`,
     // Add subtle texture overlay
     '&::before': {
@@ -86,11 +69,7 @@ const useStyles = createStyles((theme) => ({
       left: 0,
       right: 0,
       bottom: 0,
-      background: `
-        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.08) 0%, transparent 30%)
-      `,
+      background: glassStyle.textureOverlay,
       borderRadius: 'inherit',
       pointerEvents: 'none',
     },
@@ -166,13 +145,13 @@ const useStyles = createStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: '50%',
-    background: 'rgba(255, 255, 255, 0.15)',
+    background: glassStyle.isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.15)',
     cursor: 'pointer',
     opacity: 0,
     transition: 'all var(--anim-fast) var(--anim-easing)',
     zIndex: 3,
     '&:hover': {
-      background: 'rgba(255, 255, 255, 0.25)',
+      background: glassStyle.isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.25)',
       transform: 'scale(1.1)',
     },
   },
@@ -247,7 +226,8 @@ const NotificationComponent: React.FC<{
   visible: boolean, 
   position: string 
 }> = ({ notification, toastId, visible, position }) => {
-  const { classes, cx } = useStyles();
+  const glassStyle = useGlassStyle();
+  const { classes, cx } = useStyles({ glassStyle });
   const [toastKey, setToastKey] = useState(0);
   
   // No glassmorphism

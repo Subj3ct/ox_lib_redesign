@@ -5,6 +5,7 @@ import type { MenuItem } from '../../../typings';
 import { isIconUrl } from '../../../utils/isIconUrl';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import LibIcon from '../../../components/LibIcon';
+import { useGlassStyle } from '../../../hooks/useGlassStyle';
 
 interface Props {
   item: MenuItem;
@@ -14,7 +15,7 @@ interface Props {
   selected: boolean;
 }
 
-const useStyles = createStyles((theme, params: { iconColor?: string; selected: boolean; colorScheme?: string; disabled?: boolean }) => {
+const useStyles = createStyles((theme, params: { iconColor?: string; selected: boolean; colorScheme?: string; disabled?: boolean; glass: ReturnType<typeof useGlassStyle> }) => {
   const itemColor = params.colorScheme 
     ? theme.colors[params.colorScheme]?.[theme.fn.primaryShade()] || theme.colors[params.colorScheme]?.[8] || params.colorScheme
     : theme.colors[theme.primaryColor][theme.fn.primaryShade()];
@@ -28,9 +29,14 @@ const useStyles = createStyles((theme, params: { iconColor?: string; selected: b
 
   return {
     buttonContainer: {
-      // Fake glassmorphism - no backdrop-filter to prevent black background
       background: params.disabled 
-        ? `
+        ? params.glass.isDarkMode ? `
+          linear-gradient(160deg, 
+            rgba(0, 0, 0, 0.25) 0%,
+            rgba(0, 0, 0, 0.18) 25%,
+            rgba(0, 0, 0, 0.12) 50%
+          )
+        ` : `
           linear-gradient(160deg, 
             rgba(255, 255, 255, 0.03) 0%,
             rgba(255, 255, 255, 0.02) 50%,
@@ -38,7 +44,13 @@ const useStyles = createStyles((theme, params: { iconColor?: string; selected: b
           )
         `
         : params.selected 
-          ? `
+          ? params.glass.isDarkMode ? `
+            linear-gradient(160deg, 
+              rgba(0, 0, 0, 0.35) 0%,
+              rgba(0, 0, 0, 0.28) 25%,
+              rgba(0, 0, 0, 0.22) 50%
+            )
+          ` : `
             linear-gradient(160deg, 
               rgba(255, 255, 255, 0.22) 0%,
               rgba(255, 255, 255, 0.18) 50%,
@@ -50,7 +62,13 @@ const useStyles = createStyles((theme, params: { iconColor?: string; selected: b
               rgba(255, 255, 255, 0.28) 100%
             )
           `
-          : `
+          : params.glass.isDarkMode ? `
+            linear-gradient(160deg, 
+              rgba(0, 0, 0, 0.25) 0%,
+              rgba(0, 0, 0, 0.18) 25%,
+              rgba(0, 0, 0, 0.12) 50%
+            )
+          ` : `
             linear-gradient(160deg, 
               rgba(255, 255, 255, 0.12) 0%,
               rgba(255, 255, 255, 0.08) 50%,
@@ -63,10 +81,10 @@ const useStyles = createStyles((theme, params: { iconColor?: string; selected: b
             )
           `,
       border: params.disabled
-        ? '1px solid rgba(255, 255, 255, 0.05)'
+        ? `1px solid ${params.glass.isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.05)'}`
         : params.selected 
           ? `1px solid ${itemColor}`
-          : '1px solid rgba(255, 255, 255, 0.1)',
+          : `1px solid ${params.glass.isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.1)'}`,
       borderRadius: 12,
       padding: 2,
       minHeight: 60,
@@ -183,7 +201,8 @@ const useStyles = createStyles((theme, params: { iconColor?: string; selected: b
 });
 
 const ListItem = forwardRef<Array<HTMLDivElement | null>, Props>(({ item, index, scrollIndex, checked, selected }, ref) => {
-  const { classes } = useStyles({ iconColor: item.iconColor, selected, colorScheme: item.colorScheme, disabled: item.disabled });
+  const glass = useGlassStyle();
+  const { classes } = useStyles({ iconColor: item.iconColor, selected, colorScheme: item.colorScheme, disabled: item.disabled, glass });
 
   return (
     <Box

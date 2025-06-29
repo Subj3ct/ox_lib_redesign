@@ -1,5 +1,6 @@
 import { Box, createStyles, Text, keyframes } from '@mantine/core';
 import React from 'react';
+import { useGlassStyle } from '../../../hooks/useGlassStyle';
 
 const horizontalPulse = keyframes({
   '0%': {
@@ -13,14 +14,27 @@ const horizontalPulse = keyframes({
   },
 });
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((theme, params: { glass: ReturnType<typeof useGlassStyle> }) => ({
     container: {
       position: 'relative',
       textAlign: 'center',
       borderTopLeftRadius: 12,
       borderTopRightRadius: 12,
       // Fake glassmorphism - no backdrop-filter to prevent black background
-      background: `
+      background: params.glass.isDarkMode ? `
+        linear-gradient(135deg, 
+          rgba(0, 0, 0, 0.25) 0%,
+          rgba(0, 0, 0, 0.18) 25%,
+          rgba(0, 0, 0, 0.12) 50%,
+          rgba(0, 0, 0, 0.08) 75%,
+          rgba(0, 0, 0, 0.15) 100%
+        ),
+        linear-gradient(45deg,
+          rgba(20, 20, 20, 0.4) 0%,
+          rgba(10, 10, 10, 0.5) 50%,
+          rgba(0, 0, 0, 0.6) 100%
+        )
+      ` : `
         linear-gradient(160deg, 
           rgba(255, 255, 255, 0.18) 0%,
           rgba(255, 255, 255, 0.12) 50%,
@@ -37,9 +51,14 @@ const useStyles = createStyles((theme) => ({
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      border: '1px solid rgba(255, 255, 255, 0.2)',
+      border: `1px solid ${params.glass.isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.2)'}`,
       borderBottom: 'none',
-      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+      boxShadow: params.glass.isDarkMode ? `
+        0 12px 40px rgba(0, 0, 0, 0.7),
+        0 6px 20px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.4)
+      ` : '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
       overflow: 'hidden',
       '&::before': {
         content: '""',
@@ -48,7 +67,11 @@ const useStyles = createStyles((theme) => ({
         left: 0,
         right: 0,
         bottom: 0,
-        background: `
+        background: params.glass.isDarkMode ? `
+          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+          radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
+          radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 40%)
+        ` : `
           radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
           radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
           radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 40%)
@@ -84,7 +107,8 @@ const useStyles = createStyles((theme) => ({
 }));
 
 const Header: React.FC<{ title: string }> = ({ title }) => {
-  const { classes } = useStyles();
+  const glass = useGlassStyle();
+  const { classes } = useStyles({ glass });
 
   return (
     <Box className={classes.container}>

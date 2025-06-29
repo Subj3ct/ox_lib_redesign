@@ -8,6 +8,7 @@ import ScaleFade from '../../../transitions/ScaleFade';
 import type { RadialMenuItem } from '../../../typings';
 import { useLocales } from '../../../providers/LocaleProvider';
 import LibIcon from '../../../components/LibIcon';
+import { useGlassStyle } from '../../../hooks/useGlassStyle';
 
 // Gentle pulse animation for hover effect
 const hoverPulse = keyframes({
@@ -16,139 +17,180 @@ const hoverPulse = keyframes({
   '100%': { transform: 'scale(1)' },
 });
 
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 20,
-    // Transparent background to prevent GameRender black square from showing through
-    background: 'transparent',
-  },
-  radialContainer: {
-    position: 'relative',
-    width: 400,
-    height: 400,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  menuItem: {
-    position: 'absolute',
-    width: 80,
-    height: 80,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    cursor: 'pointer',
-    transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-    borderRadius: 12,
-    background: `
-      linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.25) 0%,
-        rgba(255, 255, 255, 0.18) 25%,
-        rgba(255, 255, 255, 0.12) 50%,
-        rgba(255, 255, 255, 0.08) 75%,
-        rgba(255, 255, 255, 0.15) 100%
-      ),
-      linear-gradient(45deg,
-        rgba(120, 120, 120, 0.4) 0%,
-        rgba(100, 100, 100, 0.5) 50%,
-        rgba(80, 80, 80, 0.6) 100%
-      )
-    `,
-    border: `1px solid ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}`,
-    // Enhanced shadows for depth without blur
-    boxShadow: `
-      0 12px 40px rgba(0, 0, 0, 0.5),
-      0 6px 20px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.2)
-    `,
-    '&::before': {
-      content: '""',
+const useStyles = createStyles((theme) => {
+  const glass = useGlassStyle();
+  
+  return {
+    wrapper: {
       position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: `
-        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 40%)
-      `,
-      borderRadius: 'inherit',
-      zIndex: -1,
-      pointerEvents: 'none',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 20,
+      background: 'transparent',
     },
-    '&:hover': {
-      transform: 'scale(1.15)',
-      background: `
+    radialContainer: {
+      position: 'relative',
+      width: 400,
+      height: 400,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    menuItem: {
+      position: 'absolute',
+      width: 80,
+      height: 80,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+      cursor: 'pointer',
+      transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+      borderRadius: 12,
+      background: glass.isDarkMode ? `
         linear-gradient(135deg, 
-          rgba(255, 255, 255, 0.35) 0%,
-          rgba(255, 255, 255, 0.25) 25%,
-          rgba(255, 255, 255, 0.18) 50%,
-          rgba(255, 255, 255, 0.12) 75%,
-          rgba(255, 255, 255, 0.22) 100%
+          rgba(0, 0, 0, 0.65) 0%,
+          rgba(20, 20, 20, 0.55) 25%,
+          rgba(10, 10, 10, 0.75) 50%,
+          rgba(0, 0, 0, 0.85) 75%,
+          rgba(5, 5, 5, 0.70) 100%
         ),
         linear-gradient(45deg,
-          rgba(120, 120, 120, 0.5) 0%,
-          rgba(100, 100, 100, 0.6) 50%,
-          rgba(80, 80, 80, 0.7) 100%
+          rgba(30, 30, 30, 0.6) 0%,
+          rgba(15, 15, 15, 0.7) 50%,
+          rgba(0, 0, 0, 0.8) 100%
+        )
+      ` : `
+        linear-gradient(135deg, 
+          rgba(255, 255, 255, 0.25) 0%,
+          rgba(255, 255, 255, 0.18) 25%,
+          rgba(255, 255, 255, 0.12) 50%,
+          rgba(255, 255, 255, 0.08) 75%,
+          rgba(255, 255, 255, 0.15) 100%
+        ),
+        linear-gradient(45deg,
+          rgba(120, 120, 120, 0.4) 0%,
+          rgba(100, 100, 100, 0.5) 50%,
+          rgba(80, 80, 80, 0.6) 100%
         )
       `,
-      boxShadow: `
-        0 0 25px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, 
-        0 12px 50px rgba(0, 0, 0, 0.6),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.3)
+      border: `1px solid ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}`,
+      boxShadow: glass.isDarkMode ? `
+        0 12px 40px rgba(0, 0, 0, 0.8),
+        0 6px 20px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.4)
+      ` : `
+        0 12px 40px rgba(0, 0, 0, 0.5),
+        0 6px 20px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2)
       `,
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: glass.isDarkMode ? `
+          radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+          radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.04) 0%, transparent 30%)
+        ` : `
+          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+          radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+          radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 40%)
+        `,
+        borderRadius: 'inherit',
+        zIndex: -1,
+        pointerEvents: 'none',
+      },
+      '&:hover': {
+        transform: 'scale(1.15)',
+        background: glass.isDarkMode ? `
+          linear-gradient(135deg, 
+            rgba(20, 20, 20, 0.75) 0%,
+            rgba(30, 30, 30, 0.65) 25%,
+            rgba(20, 20, 20, 0.85) 50%,
+            rgba(10, 10, 10, 0.95) 75%,
+            rgba(15, 15, 15, 0.80) 100%
+          ),
+          linear-gradient(45deg,
+            rgba(40, 40, 40, 0.7) 0%,
+            rgba(25, 25, 25, 0.8) 50%,
+            rgba(10, 10, 10, 0.9) 100%
+          )
+        ` : `
+          linear-gradient(135deg, 
+            rgba(255, 255, 255, 0.35) 0%,
+            rgba(255, 255, 255, 0.25) 25%,
+            rgba(255, 255, 255, 0.18) 50%,
+            rgba(255, 255, 255, 0.12) 75%,
+            rgba(255, 255, 255, 0.22) 100%
+          ),
+          linear-gradient(45deg,
+            rgba(120, 120, 120, 0.5) 0%,
+            rgba(100, 100, 100, 0.6) 50%,
+            rgba(80, 80, 80, 0.7) 100%
+          )
+        `,
+        boxShadow: glass.isDarkMode ? `
+          0 0 25px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, 
+          0 12px 50px rgba(0, 0, 0, 0.8),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.5)
+        ` : `
+          0 0 25px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, 
+          0 12px 50px rgba(0, 0, 0, 0.6),
+          inset 0 1px 0 rgba(255, 255, 255, 0.5),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.3)
+        `,
+      },
     },
-  },
-  menuItemContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    width: '100%',
-    height: '100%',
-    transition: 'transform 0.3s ease',
-    '&:hover': {
-      animation: `${hoverPulse} 3s infinite`,
+    menuItemContent: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+      width: '100%',
+      height: '100%',
+      transition: 'transform 0.3s ease',
+      '&:hover': {
+        animation: `${hoverPulse} 3s infinite`,
+      },
     },
-  },
-  menuIcon: {
-    fontSize: 24,
-    color: '#ffffff',
-    filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))',
-    transition: 'color var(--anim-fast) var(--anim-easing)',
-  },
-  menuIconHover: {
-    color: theme.colors[theme.primaryColor][theme.fn.primaryShade()],
-  },
-  menuLabel: {
-    fontSize: 11,
-    fontWeight: 600,
-    color: '#ffffff',
-    textAlign: 'center',
-    lineHeight: 1.2,
-    maxWidth: '100%',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-    textShadow: '0 1px 3px rgba(0, 0, 0, 0.8)',
-    letterSpacing: '0.5px',
-  },
-      centerCloseButton: {
+    menuIcon: {
+      fontSize: 24,
+      color: '#ffffff',
+      filter: glass.isDarkMode ? 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8))' : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))',
+      transition: 'color var(--anim-fast) var(--anim-easing)',
+    },
+    menuIconHover: {
+      color: theme.colors[theme.primaryColor][theme.fn.primaryShade()],
+    },
+    menuLabel: {
+      fontSize: 11,
+      fontWeight: 600,
+      color: '#ffffff',
+      textAlign: 'center',
+      lineHeight: 1.2,
+      maxWidth: '100%',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      display: '-webkit-box',
+      WebkitLineClamp: 2,
+      WebkitBoxOrient: 'vertical',
+      textShadow: glass.isDarkMode ? '0 2px 4px rgba(0, 0, 0, 0.8)' : '0 1px 3px rgba(0, 0, 0, 0.6)',
+      letterSpacing: '0.5px',
+    },
+    centerCloseButton: {
       position: 'absolute',
       top: '50%',
       left: '50%',
@@ -156,8 +198,20 @@ const useStyles = createStyles((theme) => ({
       width: 70,
       height: 70,
       borderRadius: '50%',
-      // FAKE glassmorphism - NO backdrop-filter to prevent black square
-      background: `
+      background: glass.isDarkMode ? `
+        linear-gradient(135deg, 
+          rgba(0, 0, 0, 0.65) 0%,
+          rgba(20, 20, 20, 0.55) 25%,
+          rgba(10, 10, 10, 0.75) 50%,
+          rgba(0, 0, 0, 0.85) 75%,
+          rgba(5, 5, 5, 0.70) 100%
+        ),
+        linear-gradient(45deg,
+          rgba(30, 30, 30, 0.6) 0%,
+          rgba(15, 15, 15, 0.7) 50%,
+          rgba(0, 0, 0, 0.8) 100%
+        )
+      ` : `
         linear-gradient(135deg, 
           rgba(255, 255, 255, 0.25) 0%,
           rgba(255, 255, 255, 0.18) 25%,
@@ -177,7 +231,14 @@ const useStyles = createStyles((theme) => ({
       justifyContent: 'center',
       cursor: 'pointer',
       transition: 'all var(--anim-normal) var(--anim-easing)',
-      boxShadow: `0 0 20px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, 0 8px 25px rgba(0, 0, 0, 0.4)`,
+      boxShadow: glass.isDarkMode ? `
+        0 0 20px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]},
+        0 12px 40px rgba(0, 0, 0, 0.8),
+        0 6px 20px rgba(0, 0, 0, 0.6)
+      ` : `
+        0 0 20px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]},
+        0 8px 25px rgba(0, 0, 0, 0.4)
+      `,
       '&::before': {
         content: '""',
         position: 'absolute',
@@ -185,7 +246,11 @@ const useStyles = createStyles((theme) => ({
         left: 0,
         right: 0,
         bottom: 0,
-        background: `
+        background: glass.isDarkMode ? `
+          radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+          radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.04) 0%, transparent 30%)
+        ` : `
           radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
           radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
           radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 40%)
@@ -197,46 +262,53 @@ const useStyles = createStyles((theme) => ({
       '&:hover': {
         background: theme.colors[theme.primaryColor][theme.fn.primaryShade()],
         transform: 'translate(-50%, -50%) scale(1.1)',
-        boxShadow: `0 0 30px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, 0 12px 45px rgba(0, 0, 0, 0.6)`,
+        boxShadow: glass.isDarkMode ? `
+          0 0 30px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]},
+          0 12px 45px rgba(0, 0, 0, 0.8)
+        ` : `
+          0 0 30px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]},
+          0 12px 45px rgba(0, 0, 0, 0.6)
+        `,
       },
     },
-  closeButtonContent: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    height: '100%',
-    '&:hover': {
-      animation: `${hoverPulse} 3s infinite`,
+    closeButtonContent: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%',
+      height: '100%',
+      '&:hover': {
+        animation: `${hoverPulse} 3s infinite`,
+      },
     },
-  },
-  closeIcon: {
-    fontSize: 24,
-    color: '#ffffff',
-    filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8))',
-    transition: 'color var(--anim-fast) var(--anim-easing)',
-  },
-  paginationIndicator: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, 60px)', // Position below center button
-    display: 'flex',
-    gap: 8,
-  },
-  paginationDot: {
-    width: 8,
-    height: 8,
-    borderRadius: '50%',
-    background: 'rgba(255, 255, 255, 0.4)',
-    transition: 'all var(--anim-fast) var(--anim-easing)',
-  },
-  paginationDotActive: {
-    background: theme.colors[theme.primaryColor][theme.fn.primaryShade()],
-    transform: 'scale(1.3)',
-    boxShadow: `0 0 8px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}`,
-  },
-}));
+    closeIcon: {
+      fontSize: 24,
+      color: '#ffffff',
+      filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8))',
+      transition: 'color var(--anim-fast) var(--anim-easing)',
+    },
+    paginationIndicator: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, 60px)', // Position below center button
+      display: 'flex',
+      gap: 8,
+    },
+    paginationDot: {
+      width: 8,
+      height: 8,
+      borderRadius: '50%',
+      background: 'rgba(255, 255, 255, 0.4)',
+      transition: 'all var(--anim-fast) var(--anim-easing)',
+    },
+    paginationDotActive: {
+      background: theme.colors[theme.primaryColor][theme.fn.primaryShade()],
+      transform: 'scale(1.3)',
+      boxShadow: `0 0 8px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}`,
+    },
+  };
+});
 
 const ITEMS_PER_PAGE = 8; // Max items to show at once in circle
 

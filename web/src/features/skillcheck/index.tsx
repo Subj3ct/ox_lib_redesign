@@ -6,6 +6,7 @@ import { Box, createStyles, keyframes } from '@mantine/core';
 import { motion } from 'framer-motion';
 import React from 'react';
 import type { GameDifficulty, SkillCheckProps } from '../../typings';
+import { useGlassStyle } from '../../hooks/useGlassStyle';
 
 export const circleCircumference = 2 * 50 * Math.PI;
 
@@ -135,7 +136,7 @@ const SkillCheckParticleSystem: React.FC = () => {
   );
 };
 
-const useStyles = createStyles((theme, params: { difficultyOffset: number; isExiting: boolean }) => {
+const useStyles = createStyles((theme, params: { difficultyOffset: number; isExiting: boolean; glass: ReturnType<typeof useGlassStyle> }) => {
   // Convert theme color hex to RGB for glow effects
   const hexToRgb = (hex: string) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -166,7 +167,20 @@ const useStyles = createStyles((theme, params: { difficultyOffset: number; isExi
       position: 'relative',
       width: '100%',
       height: '100%',
-      background: `
+      background: params.glass.isDarkMode ? `
+        linear-gradient(135deg, 
+          rgba(0, 0, 0, 0.25) 0%,
+          rgba(0, 0, 0, 0.18) 25%,
+          rgba(0, 0, 0, 0.12) 50%,
+          rgba(0, 0, 0, 0.08) 75%,
+          rgba(0, 0, 0, 0.15) 100%
+        ),
+        linear-gradient(45deg,
+          rgba(20, 20, 20, 0.4) 0%,
+          rgba(10, 10, 10, 0.5) 50%,
+          rgba(0, 0, 0, 0.6) 100%
+        )
+      ` : `
         linear-gradient(135deg, 
           rgba(255, 255, 255, 0.25) 0%,
           rgba(255, 255, 255, 0.18) 25%,
@@ -181,7 +195,13 @@ const useStyles = createStyles((theme, params: { difficultyOffset: number; isExi
         )
       `,
       border: `2px solid ${themeColor}`, 
-      boxShadow: `
+      boxShadow: params.glass.isDarkMode ? `
+        0 12px 40px rgba(0, 0, 0, 0.7),
+        0 6px 20px rgba(0, 0, 0, 0.6),
+        0 0 30px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.4)
+      ` : `
         0 12px 40px rgba(0, 0, 0, 0.5),
         0 6px 20px rgba(0, 0, 0, 0.4),
         0 0 30px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4),
@@ -202,7 +222,11 @@ const useStyles = createStyles((theme, params: { difficultyOffset: number; isExi
         left: 0,
         right: 0,
         bottom: 0,
-        background: `
+        background: params.glass.isDarkMode ? `
+          radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+          radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
+          radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 40%)
+        ` : `
           radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
           radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.10) 0%, transparent 50%),
           radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 40%)
@@ -347,7 +371,8 @@ const SkillCheck: React.FC = () => {
     difficulty: 'easy',
     key: 'e',
   });
-  const { classes } = useStyles({ difficultyOffset: skillCheck.difficultyOffset, isExiting });
+  const glass = useGlassStyle();
+  const { classes } = useStyles({ difficultyOffset: skillCheck.difficultyOffset, isExiting, glass });
 
   // Enable glassmorphism when skillcheck is visible OR pre-warming
   // useConditionalGlassmorphism(visible || preWarm, 'SkillCheck');

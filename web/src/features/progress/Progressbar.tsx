@@ -5,6 +5,8 @@ import { useNuiEvent } from '../../hooks/useNuiEvent';
 import { fetchNui } from '../../utils/fetchNui';
 import ScaleFade from '../../transitions/ScaleFade';
 import type { ProgressbarProps } from '../../typings';
+import { useGlassStyle } from '../../hooks/useGlassStyle';
+import type { GlassStyle } from '../../hooks/useGlassStyle';
 
 const breathe = keyframes({
   '0%, 100%': { 
@@ -92,7 +94,7 @@ const floatParticles = keyframes({
 
 
 
-const useStyles = createStyles((theme) => {
+const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => {
   const progressGlow = keyframes({
     '0%, 100%': { 
       boxShadow: `0 0 20px rgba(${theme.colors[theme.primaryColor][theme.fn.primaryShade()]
@@ -135,7 +137,20 @@ const useStyles = createStyles((theme) => {
     position: 'relative',
     overflow: 'hidden',
     fontFamily: 'Roboto',
-    background: `
+    background: glass.isDarkMode ? `
+      linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.25) 0%,
+        rgba(0, 0, 0, 0.18) 25%,
+        rgba(0, 0, 0, 0.12) 50%,
+        rgba(0, 0, 0, 0.08) 75%,
+        rgba(0, 0, 0, 0.15) 100%
+      ),
+      linear-gradient(45deg,
+        rgba(20, 20, 20, 0.4) 0%,
+        rgba(10, 10, 10, 0.5) 50%,
+        rgba(0, 0, 0, 0.6) 100%
+      )
+    ` : `
       linear-gradient(135deg, 
         rgba(255, 255, 255, 0.25) 0%,
         rgba(255, 255, 255, 0.18) 25%,
@@ -149,8 +164,13 @@ const useStyles = createStyles((theme) => {
         rgba(80, 80, 80, 0.6) 100%
       )
     `,
-    border: '1px solid rgba(255, 255, 255, 0.3)',
-    boxShadow: `
+    border: `1px solid ${glass.isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.3)'}`,
+    boxShadow: glass.isDarkMode ? `
+      0 12px 40px rgba(0, 0, 0, 0.7),
+      0 6px 20px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.4)
+    ` : `
       0 12px 40px rgba(0, 0, 0, 0.5),
       0 6px 20px rgba(0, 0, 0, 0.4),
       inset 0 1px 0 rgba(255, 255, 255, 0.4),
@@ -165,7 +185,11 @@ const useStyles = createStyles((theme) => {
       left: 0,
       right: 0,
       bottom: 0,
-      background: `
+      background: glass.isDarkMode ? `
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 40%)
+      ` : `
         radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
         radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
         radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 40%)
@@ -316,7 +340,8 @@ const ParticleSystem: React.FC = () => {
 };
 
 const Progressbar: React.FC = () => {
-  const { classes, cx } = useStyles();
+  const glass = useGlassStyle();
+  const { classes, cx } = useStyles({ glass });
   const [visible, setVisible] = React.useState(false);
   const [label, setLabel] = React.useState('');
   const [duration, setDuration] = React.useState(0);
