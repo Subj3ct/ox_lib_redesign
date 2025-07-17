@@ -305,6 +305,7 @@ const CustomSelectField: React.FC<Props> = (props) => {
   const [isClosing, setIsClosing] = useState(false);
   const [selectedValue, setSelectedValue] = useState(props.row.options?.find(opt => opt.value === props.row.default)?.label || '');
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [filterText, setFilterText] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
   
@@ -322,7 +323,7 @@ const CustomSelectField: React.FC<Props> = (props) => {
     if (isMultiSelect) {
       return ''; // We'll show chips instead
     }
-    return selectedValue;
+    return isOpen ? filterText : selectedValue;
   };
 
   // Get selected options for chips
@@ -355,6 +356,7 @@ const CustomSelectField: React.FC<Props> = (props) => {
   const closeDropdown = useCallback(() => {
     if (isOpen && !isClosing) {
       setIsClosing(true);
+      setFilterText(''); // Clear filter when closing
       setTimeout(() => {
         setIsOpen(false);
         setIsClosing(false);
@@ -407,6 +409,26 @@ const CustomSelectField: React.FC<Props> = (props) => {
     } else {
       calculateDropdownPosition();
       setIsOpen(true);
+      setFilterText(''); // Reset filter when opening
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilterText(e.target.value);
+  };
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      // Find first matching option and select it
+      const filteredOptions = props.row.options?.filter(option => 
+        option.label?.toLowerCase().includes(filterText.toLowerCase())
+      ) || [];
+      
+      if (filteredOptions.length > 0) {
+        handleItemClick(filteredOptions[0]);
+      }
+    } else if (e.key === 'Escape') {
+      closeDropdown();
     }
   };
 
@@ -460,7 +482,9 @@ const CustomSelectField: React.FC<Props> = (props) => {
               type="text"
               value={getDisplayValue()}
               onClick={toggleDropdown}
-              readOnly
+              onChange={handleInputChange}
+              onKeyDown={handleInputKeyDown}
+              readOnly={!isOpen}
               className={classes.inputField}
               placeholder={props.row.placeholder || 'Select an option...'}
               disabled={props.row.disabled}
@@ -490,26 +514,40 @@ const CustomSelectField: React.FC<Props> = (props) => {
                 : 'slideUnfold 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards',
             }}
           >
-            {props.row.options?.map((option, index) => {
-              const isSelected = isMultiSelect 
-                ? selectedValues.includes(option.value)
-                : option.value === controller.field.value;
+            {(() => {
+              const filteredOptions = props.row.options?.filter(option => 
+                option.label?.toLowerCase().includes(filterText.toLowerCase())
+              ) || [];
               
-              return (
-              <div
-                key={index}
-                className={cx(classes.dropdownItem, { 
-                    selected: isSelected 
-                })}
-                onClick={() => handleItemClick(option)}
-              >
-                <span>{option.label}</span>
-                  {isMultiSelect && isSelected && (
-                    <LibIcon icon="check" style={{ marginLeft: 'auto', fontSize: '14px' }} />
-                  )}
-              </div>
-              );
-            })}
+              if (filteredOptions.length === 0 && filterText) {
+                return (
+                  <div className={classes.dropdownItem} style={{ cursor: 'default', opacity: 0.6 }}>
+                    <span>No matches</span>
+                  </div>
+                );
+              }
+              
+              return filteredOptions.map((option, index) => {
+                const isSelected = isMultiSelect 
+                  ? selectedValues.includes(option.value)
+                  : option.value === controller.field.value;
+                
+                return (
+                <div
+                  key={index}
+                  className={cx(classes.dropdownItem, { 
+                      selected: isSelected 
+                  })}
+                  onClick={() => handleItemClick(option)}
+                >
+                  <span>{option.label}</span>
+                    {isMultiSelect && isSelected && (
+                      <LibIcon icon="check" style={{ marginLeft: 'auto', fontSize: '14px' }} />
+                    )}
+                </div>
+                );
+              });
+            })()}
           </div>,
           document.body
         )}

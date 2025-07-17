@@ -170,7 +170,8 @@ function lib.progressBar(data)
             action = 'progress',
             data = {
                 label = data.label,
-                duration = data.duration
+                duration = data.duration,
+                icon = data.icon
             }
         })
 

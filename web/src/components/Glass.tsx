@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, BoxProps } from '@mantine/core';
 
+
 interface GlassProps extends BoxProps {
   children?: React.ReactNode;
   onClick?: () => void;

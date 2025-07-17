@@ -27,6 +27,20 @@
 
 local settings = require 'resource.settings'
 
+-- Validate and sanitize style data to prevent CSSStyleDeclaration errors
+local function validateStyle(style)
+    if not style then return nil end
+    
+    -- If it's already a valid table, return it
+    if type(style) == 'table' and not table.type(style) == 'empty' then
+        return style
+    end
+    
+    -- If it's a string or any other invalid type, return nil
+    -- This prevents the CSSStyleDeclaration error when spread in NUI
+    return nil
+end
+
 ---`client`
 ---@param data NotifyProps
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -34,11 +48,24 @@ function lib.notify(data)
     local sound = settings.notification_audio and data.sound
     data.sound = nil
     data.position = data.position or settings.notification_position
+    
+    -- Validate style data to prevent CSSStyleDeclaration errors
+    data.style = validateStyle(data.style)
 
-    SendNUIMessage({
-        action = 'notify',
-        data = data
-    })
+    if GetResourceState("17mov_Hud") == "started" then
+        if data.type == "inform" then
+            data.type = "info"
+        elseif data.type == "warning" then
+            data.type = "info"
+        end
+
+        exports["17mov_Hud"]:ShowNotification(data.description, data.type, data.title, data.duration)
+    else
+        SendNUIMessage({
+            action = 'notify',
+            data = data
+        })
+    end
 
     if not sound then return end
 
@@ -64,7 +91,7 @@ function lib.defaultNotify(data)
     -- Backwards compat for v3
     data.type = data.status
     if data.type == 'inform' then data.type = 'info' end
-    return lib.notify(data --[[@as NotifyProps]])
+    return lib.notify(data)
 end
 
 RegisterNetEvent('ox_lib:notify', lib.notify)

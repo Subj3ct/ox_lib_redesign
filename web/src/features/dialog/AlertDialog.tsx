@@ -1,4 +1,4 @@
-import { Button, createStyles, Group, Modal, Stack, useMantineTheme, keyframes, Box, Text } from '@mantine/core';
+import { Button, createStyles, Group, Modal, Stack, keyframes, Box, Text } from '@mantine/core';
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useNuiEvent } from '../../hooks/useNuiEvent';
@@ -9,6 +9,7 @@ import type { AlertProps } from '../../typings';
 import MarkdownComponents from '../../config/MarkdownComponents';
 import { useConditionalGlassmorphism } from '../../components/GameRender';
 import { useGlassStyle } from '../../hooks/useGlassStyle';
+import { useSafeTheme } from '../../hooks/useSafeTheme';
 import type { GlassStyle } from '../../hooks/useGlassStyle';
 
 const breathe = keyframes({
@@ -281,7 +282,7 @@ const AlertDialog: React.FC = () => {
   const { locale } = useLocales();
   const glass = useGlassStyle();
   const { classes, cx } = useStyles({ glass });
-  const theme = useMantineTheme();
+  const theme = useSafeTheme();
   const [opened, setOpened] = useState(false);
   const [preWarm, setPreWarm] = useState(false); // Pre-warm glassmorphism
   const [isExiting, setIsExiting] = useState(false);

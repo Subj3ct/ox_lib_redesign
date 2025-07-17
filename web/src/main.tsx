@@ -11,6 +11,7 @@ import LocaleProvider from './providers/LocaleProvider';
 import ConfigProvider from './providers/ConfigProvider';
 import ErrorBoundary from './providers/errorBoundary';
 
+
 library.add(fas, far, fab);
 
 if (isEnvBrowser()) {

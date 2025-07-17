@@ -19,11 +19,25 @@ local function safeGetKvp(fn, key, default)
     return result or default
 end
 
+-- Handle both string and integer convar values for dark mode
+local function getDarkModeConvar()
+    local convarValue = GetConvar('ox:darkMode', '0')
+    if convarValue == 'true' or convarValue == '1' or convarValue == 'yes' then
+        return 1
+    elseif convarValue == 'false' or convarValue == '0' or convarValue == 'no' then
+        return 0
+    else
+        -- Try to parse as integer
+        local numValue = tonumber(convarValue)
+        return numValue and (numValue ~= 0 and 1 or 0) or 0
+    end
+end
+
 local settings = {
     default_locale = GetConvar('ox:locale', 'en'),
     notification_position = safeGetKvp(GetResourceKvpString, 'notification_position', 'top-right'),
     notification_audio = safeGetKvp(GetResourceKvpInt, 'notification_audio') == 1,
-    dark_mode = safeGetKvp(GetResourceKvpInt, 'dark_mode', GetConvarInt('ox:darkMode', 0)) == 1
+    dark_mode = safeGetKvp(GetResourceKvpInt, 'dark_mode', getDarkModeConvar()) == 1
 }
 
 local userLocales = GetConvarInt('ox:userLocales', 1) == 1

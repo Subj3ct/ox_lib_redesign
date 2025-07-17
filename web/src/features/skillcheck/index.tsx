@@ -1,12 +1,12 @@
-import { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useNuiEvent } from '../../hooks/useNuiEvent';
 import Indicator from './indicator';
 import { fetchNui } from '../../utils/fetchNui';
 import { Box, createStyles, keyframes } from '@mantine/core';
 import { motion } from 'framer-motion';
-import React from 'react';
 import type { GameDifficulty, SkillCheckProps } from '../../typings';
 import { useGlassStyle } from '../../hooks/useGlassStyle';
+
 
 export const circleCircumference = 2 * 50 * Math.PI;
 
@@ -70,23 +70,28 @@ const slideOutScale = keyframes({
 });
 
 // Dynamic Particle System Component for skill check background
-const SkillCheckParticleSystem: React.FC = () => {
+const SkillCheckParticleSystem: React.FC<{ themeColor: string }> = ({ themeColor }) => {
   const particles = React.useMemo(() => {
-    return Array.from({ length: 70 }, (_, i) => {
-      const isBigParticle = i < 10; // First 10 are bigger particles
+    return Array.from({ length: 12 }, (_, i) => { // Reduced from 70 to 12 particles
+      const isBigParticle = i < 3; // First 3 are bigger particles
       return {
         id: i,
-        angle: (i / 70) * 360,
-        radius: 80 + Math.random() * 50, // Larger range for more variety
+        angle: (i / 12) * 360,
+        radius: 90 + Math.random() * 30, // Smaller range for less variety
         size: isBigParticle 
-          ? Math.random() * 3 + 2 // Big particles: 2-5px
-          : Math.random() * 2 + 0.5, // Normal particles: 0.5-2.5px
-        duration: Math.random() * 4 + 3,
-        delay: Math.random() * 2,
-        isThemeColor: Math.random() > 0.3, // Even more theme colored particles (70%)
+          ? Math.random() * 3 + 4 // Big particles: 4-7px
+          : Math.random() * 2 + 2, // Normal particles: 2-4px
+        duration: Math.random() * 2 + 2, // Shorter duration
+        delay: Math.random() * 1,
+        isThemeColor: Math.random() > 0.5, // Fewer theme colored particles (50%)
       };
     });
   }, []);
+
+  // Validate theme color ONCE outside the loop for performance
+  const safeThemeColor = React.useMemo(() => {
+    return themeColor && typeof themeColor === 'string' && themeColor.startsWith('#') ? themeColor : '#ef4444';
+  }, [themeColor]);
 
   return (
     <div style={{ 
@@ -111,23 +116,23 @@ const SkillCheckParticleSystem: React.FC = () => {
               top: '50%',
               width: `${particle.size}px`,
               height: `${particle.size}px`,
-              backgroundColor: particle.isThemeColor ? 'var(--mantine-primary-color)' : 'rgba(255, 255, 255, 0.8)',
+              backgroundColor: particle.isThemeColor ? safeThemeColor : 'rgba(255, 255, 255, 0.8)',
               borderRadius: '50%',
               boxShadow: particle.isThemeColor 
-                ? '0 0 8px var(--mantine-primary-color)' 
+                ? `0 0 8px ${safeThemeColor}` 
                 : '0 0 6px rgba(255, 255, 255, 0.6)',
             }}
             animate={{
-              x: [x, x + 20, x - 10, x + 15, x],
-              y: [y, y - 25, y + 15, y - 20, y],
-              opacity: [0.2, 1, 0.4, 0.9, 0.2],
-              scale: [1, 1.5, 0.6, 1.4, 1],
+              x: [x, x + 10, x],
+              y: [y, y - 15, y],
+              opacity: [0.3, 0.8, 0.3],
+              scale: [1, 1.2, 1],
             }}
             transition={{
               duration: particle.duration,
               delay: particle.delay,
               repeat: Infinity,
-              ease: "easeInOut",
+              ease: "linear",
             }}
           />
         );
@@ -137,18 +142,42 @@ const SkillCheckParticleSystem: React.FC = () => {
 };
 
 const useStyles = createStyles((theme, params: { difficultyOffset: number; isExiting: boolean; glass: ReturnType<typeof useGlassStyle> }) => {
-  // Convert theme color hex to RGB for glow effects
+  // Use the safe theme color utility
+  const themeColor = theme.colors?.[theme.primaryColor]?.[theme.fn?.primaryShade() ?? 8] ?? '#ef4444';
+  
+  // Convert theme color hex to RGB for glow effects with bulletproof fallbacks
   const hexToRgb = (hex: string) => {
+    if (!hex || typeof hex !== 'string') {
+      return { r: 239, g: 68, b: 68 }; // fallback to red
+    }
+    
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : { r: 239, g: 68, b: 68 }; // fallback to red
+    if (!result) {
+      return { r: 239, g: 68, b: 68 }; // fallback to red
+    }
+    
+    const r = parseInt(result[1], 16);
+    const g = parseInt(result[2], 16);
+    const b = parseInt(result[3], 16);
+    
+    // Ensure all values are valid numbers
+    return {
+      r: isNaN(r) ? 239 : r,
+      g: isNaN(g) ? 68 : g,
+      b: isNaN(b) ? 68 : b
+    };
   };
 
-  const themeColor = theme.colors[theme.primaryColor][theme.fn.primaryShade()];
   const rgb = hexToRgb(themeColor);
+  
+  // Create safe RGBA function that always returns valid CSS
+  const safeRgba = (r: number, g: number, b: number, a: number) => {
+    const safeR = Math.max(0, Math.min(255, isNaN(r) ? 239 : r));
+    const safeG = Math.max(0, Math.min(255, isNaN(g) ? 68 : g));
+    const safeB = Math.max(0, Math.min(255, isNaN(b) ? 68 : b));
+    const safeA = Math.max(0, Math.min(1, isNaN(a) ? 1 : a));
+    return `rgba(${safeR}, ${safeG}, ${safeB}, ${safeA})`;
+  };
 
   return {
     // Positioning wrapper - handles centering only
@@ -198,13 +227,13 @@ const useStyles = createStyles((theme, params: { difficultyOffset: number; isExi
       boxShadow: params.glass.isDarkMode ? `
         0 12px 40px rgba(0, 0, 0, 0.7),
         0 6px 20px rgba(0, 0, 0, 0.6),
-        0 0 30px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4),
+        0 0 30px ${safeRgba(rgb.r, rgb.g, rgb.b, 0.4)},
         inset 0 1px 0 rgba(255, 255, 255, 0.1),
         inset 0 -1px 0 rgba(0, 0, 0, 0.4)
       ` : `
         0 12px 40px rgba(0, 0, 0, 0.5),
         0 6px 20px rgba(0, 0, 0, 0.4),
-        0 0 30px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4),
+        0 0 30px ${safeRgba(rgb.r, rgb.g, rgb.b, 0.4)},
         inset 0 1px 0 rgba(255, 255, 255, 0.4),
         inset 0 -1px 0 rgba(0, 0, 0, 0.2)
       `,
@@ -284,7 +313,7 @@ const useStyles = createStyles((theme, params: { difficultyOffset: number; isExi
       cy: 125,
       strokeDasharray: circleCircumference,
       strokeDashoffset: circleCircumference - (Math.PI * 50 * params.difficultyOffset) / 180,
-      filter: `drop-shadow(0 0 15px ${themeColor}) drop-shadow(0 0 30px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6))`,
+      filter: `drop-shadow(0 0 15px ${themeColor}) drop-shadow(0 0 30px ${safeRgba(rgb.r, rgb.g, rgb.b, 0.6)})`,
       strokeLinecap: 'round' as const,
       '@media (min-height: 1440px)': {
         strokeWidth: 10,
@@ -326,7 +355,7 @@ const useStyles = createStyles((theme, params: { difficultyOffset: number; isExi
       border: '2px solid rgba(255, 255, 255, 0.3)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
-      boxShadow: `0 8px 24px rgba(0, 0, 0, 0.2), inset 0 2px 0 rgba(255, 255, 255, 0.2), 0 0 20px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`,
+      boxShadow: `0 8px 24px rgba(0, 0, 0, 0.2), inset 0 2px 0 rgba(255, 255, 255, 0.2), 0 0 20px ${safeRgba(rgb.r, rgb.g, rgb.b, 0.3)}`,
       borderRadius: '50%',
       display: 'flex',
       justifyContent: 'center',
@@ -346,7 +375,7 @@ const useStyles = createStyles((theme, params: { difficultyOffset: number; isExi
         left: 0,
         right: 0,
         bottom: 0,
-        background: `linear-gradient(135deg, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1), transparent)`,
+        background: `linear-gradient(135deg, ${safeRgba(rgb.r, rgb.g, rgb.b, 0.1)}, transparent)`,
         borderRadius: 'inherit',
         zIndex: -1,
       },
@@ -362,7 +391,7 @@ const useStyles = createStyles((theme, params: { difficultyOffset: number; isExi
 const SkillCheck: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
-  const [preWarm, setPreWarm] = useState(false); // Pre-warm glassmorphism
+  const [preWarm, setPreWarm] = useState(false);
   const dataRef = useRef<{ difficulty: GameDifficulty | GameDifficulty[]; inputs?: string[] } | null>(null);
   const dataIndexRef = useRef<number>(0);
   const [skillCheck, setSkillCheck] = useState<SkillCheckProps>({
@@ -371,13 +400,53 @@ const SkillCheck: React.FC = () => {
     difficulty: 'easy',
     key: 'e',
   });
+  
+  // Refs for timeout cleanup
+  const showTimeoutRef = useRef<number | null>(null);
+  const hideTimeoutRef = useRef<number | null>(null);
   const glass = useGlassStyle();
-  const { classes } = useStyles({ difficultyOffset: skillCheck.difficultyOffset, isExiting, glass });
+  const { classes, theme } = useStyles({ difficultyOffset: skillCheck.difficultyOffset, isExiting, glass });
+  
+  // Get safe theme color for particles
+  const safeThemeColor = theme.colors?.[theme.primaryColor]?.[theme.fn?.primaryShade() ?? 8] ?? '#ef4444';
 
-  // Enable glassmorphism when skillcheck is visible OR pre-warming
-  // useConditionalGlassmorphism(visible || preWarm, 'SkillCheck');
+  // Cleanup function to clear all timeouts and reset state
+  const cleanup = useCallback(() => {
+    if (showTimeoutRef.current) {
+      clearTimeout(showTimeoutRef.current);
+      showTimeoutRef.current = null;
+    }
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+    setPreWarm(false);
+    setIsExiting(false);
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return cleanup;
+  }, [cleanup]);
+
+  const hideSkillCheck = useCallback((success: boolean) => {
+    cleanup(); // Clear any existing timeouts
+    setIsExiting(true);
+    setPreWarm(false);
+    
+    hideTimeoutRef.current = window.setTimeout(() => {
+      setVisible(false);
+      setIsExiting(false);
+      dataRef.current = null;
+      dataIndexRef.current = 0;
+    }, 400);
+    
+    fetchNui('skillCheckOver', success);
+  }, [cleanup]);
 
   useNuiEvent('startSkillCheck', (data: { difficulty: GameDifficulty | GameDifficulty[]; inputs?: string[] }) => {
+    cleanup(); // Clear any existing timeouts before starting new skillcheck
+    
     dataRef.current = data;
     dataIndexRef.current = 0;
     const gameData = Array.isArray(data.difficulty) ? data.difficulty[0] : data.difficulty;
@@ -385,7 +454,7 @@ const SkillCheck: React.FC = () => {
     const randomKey = data.inputs ? data.inputs[Math.floor(Math.random() * data.inputs.length)] : 'e';
     
     // Generate angle ensuring good distance from starting position
-    const skillZoneAngle = -90 + getRandomAngle(140, 300, 120); // Ensure at least 120 degrees from start
+    const skillZoneAngle = -90 + getRandomAngle(140, 300, 120);
     
     setSkillCheck({
       angle: skillZoneAngle,
@@ -399,43 +468,28 @@ const SkillCheck: React.FC = () => {
     setPreWarm(true);
     
     // Small delay to ensure canvas is ready, then show skillcheck
-    setTimeout(() => {
+    showTimeoutRef.current = window.setTimeout(() => {
       setIsExiting(false);
       setVisible(true);
-      setPreWarm(false); // Stop pre-warming, visible takes over
-    }, 50); // 50ms pre-warm for instant appearance
+      setPreWarm(false);
+    }, 50);
   });
 
   useNuiEvent('skillCheckCancel', () => {
-    setIsExiting(true);
-    setPreWarm(false); // Stop pre-warming
-    setTimeout(() => {
-      setVisible(false);
-      setIsExiting(false);
-    }, 400);
-    fetchNui('skillCheckOver', false);
+    hideSkillCheck(false);
   });
 
-  const handleComplete = (success: boolean) => {
+  const handleComplete = useCallback((success: boolean) => {
     if (!dataRef.current) return;
+    
     if (!success || !Array.isArray(dataRef.current.difficulty)) {
-      setIsExiting(true);
-      setPreWarm(false); // Stop pre-warming
-      setTimeout(() => {
-        setVisible(false);
-        setIsExiting(false);
-      }, 400);
-      return fetchNui('skillCheckOver', success);
+      hideSkillCheck(success);
+      return;
     }
 
     if (dataIndexRef.current >= dataRef.current.difficulty.length - 1) {
-      setIsExiting(true);
-      setPreWarm(false); // Stop pre-warming
-      setTimeout(() => {
-        setVisible(false);
-        setIsExiting(false);
-      }, 400);
-      return fetchNui('skillCheckOver', success);
+      hideSkillCheck(success);
+      return;
     }
 
     dataIndexRef.current++;
@@ -455,14 +509,14 @@ const SkillCheck: React.FC = () => {
       difficulty: data,
       key: key.toLowerCase(),
     }));
-  };
+  }, [hideSkillCheck]);
 
   return (
     <>
       {visible && (
         <div className={classes.positionWrapper}>
           <Box className={classes.container}>
-            <SkillCheckParticleSystem />
+            <SkillCheckParticleSystem themeColor={safeThemeColor} />
             <div className={classes.svgContainer}>
               <svg className={classes.svg} viewBox="0 0 250 250">
                 {/* Background track */}

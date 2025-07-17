@@ -10,6 +10,8 @@ import { useLocales } from '../../../providers/LocaleProvider';
 import LibIcon from '../../../components/LibIcon';
 import { useGlassStyle } from '../../../hooks/useGlassStyle';
 
+import { useSafeTheme } from '../../../hooks/useSafeTheme';
+
 // Gentle pulse animation for hover effect
 const hoverPulse = keyframes({
   '0%': { transform: 'scale(1)' },
@@ -17,8 +19,7 @@ const hoverPulse = keyframes({
   '100%': { transform: 'scale(1)' },
 });
 
-const useStyles = createStyles((theme) => {
-  const glass = useGlassStyle();
+const useStyles = createStyles((theme, { safeThemeColor, glass }: { safeThemeColor: string; glass: ReturnType<typeof useGlassStyle> }) => {
   
   return {
     wrapper: {
@@ -79,7 +80,7 @@ const useStyles = createStyles((theme) => {
           rgba(80, 80, 80, 0.6) 100%
         )
       `,
-      border: `1px solid ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}`,
+      border: `1px solid ${safeThemeColor}`,
       boxShadow: glass.isDarkMode ? `
         0 12px 40px rgba(0, 0, 0, 0.8),
         0 6px 20px rgba(0, 0, 0, 0.6),
@@ -141,12 +142,12 @@ const useStyles = createStyles((theme) => {
           )
         `,
         boxShadow: glass.isDarkMode ? `
-          0 0 25px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, 
+          0 0 25px ${safeThemeColor}, 
           0 12px 50px rgba(0, 0, 0, 0.8),
           inset 0 1px 0 rgba(255, 255, 255, 0.2),
           inset 0 -1px 0 rgba(0, 0, 0, 0.5)
         ` : `
-          0 0 25px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, 
+          0 0 25px ${safeThemeColor}, 
           0 12px 50px rgba(0, 0, 0, 0.6),
           inset 0 1px 0 rgba(255, 255, 255, 0.5),
           inset 0 -1px 0 rgba(0, 0, 0, 0.3)
@@ -173,7 +174,7 @@ const useStyles = createStyles((theme) => {
       transition: 'color var(--anim-fast) var(--anim-easing)',
     },
     menuIconHover: {
-      color: theme.colors[theme.primaryColor][theme.fn.primaryShade()],
+      color: safeThemeColor,
     },
     menuLabel: {
       fontSize: 11,
@@ -225,18 +226,18 @@ const useStyles = createStyles((theme) => {
           rgba(80, 80, 80, 0.6) 100%
         )
       `,
-      border: `3px solid ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}`,
+      border: `3px solid ${safeThemeColor}`,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       cursor: 'pointer',
       transition: 'all var(--anim-normal) var(--anim-easing)',
       boxShadow: glass.isDarkMode ? `
-        0 0 20px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]},
+        0 0 20px ${safeThemeColor},
         0 12px 40px rgba(0, 0, 0, 0.8),
         0 6px 20px rgba(0, 0, 0, 0.6)
       ` : `
-        0 0 20px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]},
+        0 0 20px ${safeThemeColor},
         0 8px 25px rgba(0, 0, 0, 0.4)
       `,
       '&::before': {
@@ -260,13 +261,13 @@ const useStyles = createStyles((theme) => {
         pointerEvents: 'none',
       },
       '&:hover': {
-        background: theme.colors[theme.primaryColor][theme.fn.primaryShade()],
+        background: safeThemeColor,
         transform: 'translate(-50%, -50%) scale(1.1)',
         boxShadow: glass.isDarkMode ? `
-          0 0 30px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]},
+          0 0 30px ${safeThemeColor},
           0 12px 45px rgba(0, 0, 0, 0.8)
         ` : `
-          0 0 30px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]},
+          0 0 30px ${safeThemeColor},
           0 12px 45px rgba(0, 0, 0, 0.6)
         `,
       },
@@ -303,9 +304,9 @@ const useStyles = createStyles((theme) => {
       transition: 'all var(--anim-fast) var(--anim-easing)',
     },
     paginationDotActive: {
-      background: theme.colors[theme.primaryColor][theme.fn.primaryShade()],
+      background: safeThemeColor,
       transform: 'scale(1.3)',
-      boxShadow: `0 0 8px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}`,
+      boxShadow: `0 0 8px ${safeThemeColor}`,
     },
   };
 });
@@ -322,8 +323,11 @@ const RadialMenu: React.FC = () => {
   const [menuItems, setMenuItems] = useState<RadialMenuItem[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const { locale } = useLocales();
+  const theme = useSafeTheme();
+  const safeThemeColor = theme.colors?.[theme.primaryColor]?.[theme.fn?.primaryShade() ?? 8] ?? '#ef4444';
+  const glass = useGlassStyle();
 
-  const { classes, cx } = useStyles();
+  const { classes, cx } = useStyles({ safeThemeColor, glass });
 
   const changePage = async (increment?: boolean) => {
     await fetchNui('radialTransition');

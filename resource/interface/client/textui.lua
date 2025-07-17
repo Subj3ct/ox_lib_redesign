@@ -16,6 +16,20 @@
 local isOpen = false
 local currentText
 
+-- Validate and sanitize style data to prevent CSSStyleDeclaration errors
+local function validateStyle(style)
+    if not style then return nil end
+    
+    -- If it's already a valid table, return it
+    if type(style) == 'table' and not table.type(style) == 'empty' then
+        return style
+    end
+    
+    -- If it's a string or any other invalid type, return nil
+    -- This prevents the CSSStyleDeclaration error when spread in NUI
+    return nil
+end
+
 ---@param text string
 ---@param options? TextUIOptions
 function lib.showTextUI(text, options)
@@ -25,6 +39,9 @@ function lib.showTextUI(text, options)
 
     options.text = text
     currentText = text
+    
+    -- Validate style data to prevent CSSStyleDeclaration errors
+    options.style = validateStyle(options.style)
 
     SendNUIMessage({
         action = 'textUi',

@@ -8,6 +8,10 @@ import type { ProgressbarProps } from '../../typings';
 import { useGlassStyle } from '../../hooks/useGlassStyle';
 import type { GlassStyle } from '../../hooks/useGlassStyle';
 
+import { useSafeTheme } from '../../hooks/useSafeTheme';
+import LibIcon from '../../components/LibIcon';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
+
 const breathe = keyframes({
   '0%, 100%': { 
     transform: 'scale(1)',
@@ -18,8 +22,6 @@ const breathe = keyframes({
     opacity: 0.95,
   },
 });
-
-
 
 const slideInScale = keyframes({
   '0%': {
@@ -74,8 +76,6 @@ const scanLine = keyframes({
   },
 });
 
-
-
 // Floating particles animation
 const floatParticles = keyframes({
   '0%, 100%': {
@@ -92,27 +92,28 @@ const floatParticles = keyframes({
   },
 });
 
-
-
-const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => {
+const useStyles = createStyles((theme, { glass, safeThemeColor }: { glass: GlassStyle; safeThemeColor: string }) => {
+  // Use safe theme color utility
+  const themeColor = safeThemeColor;
+  
   const progressGlow = keyframes({
     '0%, 100%': { 
-      boxShadow: `0 0 20px rgba(${theme.colors[theme.primaryColor][theme.fn.primaryShade()]
+      boxShadow: `0 0 20px rgba(${themeColor
         .replace('#', '')
         .match(/.{2}/g)
         ?.map(hex => parseInt(hex, 16))
-        .join(', ') || '239, 68, 68'}, 0.4), 0 0 40px rgba(${theme.colors[theme.primaryColor][theme.fn.primaryShade()]
+        .join(', ') || '239, 68, 68'}, 0.4), 0 0 40px rgba(${themeColor
         .replace('#', '')
         .match(/.{2}/g)
         ?.map(hex => parseInt(hex, 16))
         .join(', ') || '239, 68, 68'}, 0.2)`,
     },
     '50%': { 
-      boxShadow: `0 0 30px rgba(${theme.colors[theme.primaryColor][theme.fn.primaryShade()]
+      boxShadow: `0 0 30px rgba(${themeColor
         .replace('#', '')
         .match(/.{2}/g)
         ?.map(hex => parseInt(hex, 16))
-        .join(', ') || '239, 68, 68'}, 0.6), 0 0 60px rgba(${theme.colors[theme.primaryColor][theme.fn.primaryShade()]
+        .join(', ') || '239, 68, 68'}, 0.6), 0 0 60px rgba(${themeColor
         .replace('#', '')
         .match(/.{2}/g)
         ?.map(hex => parseInt(hex, 16))
@@ -130,12 +131,13 @@ const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => {
     bottom: 0,
     position: 'absolute',
     padding: '0 20px',
+    paddingTop: '50px', // Add padding to accommodate icon and percentage above
   },
   container: {
     width: 400,
     height: 45,
     position: 'relative',
-    overflow: 'hidden',
+    overflow: 'visible',
     fontFamily: 'Roboto',
     background: glass.isDarkMode ? `
       linear-gradient(135deg, 
@@ -212,12 +214,12 @@ const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => {
     left: 0,
     bottom: 0,
     background: `linear-gradient(90deg, 
-      rgba(${theme.colors[theme.primaryColor][theme.fn.primaryShade()]
+      rgba(${themeColor
         .replace('#', '')
         .match(/.{2}/g)
         ?.map(hex => parseInt(hex, 16))
         .join(', ') || '239, 68, 68'}, 0.7), 
-      rgba(${theme.colors[theme.primaryColor][theme.fn.primaryShade()]
+      rgba(${themeColor
         .replace('#', '')
         .match(/.{2}/g)
         ?.map(hex => parseInt(hex, 16))
@@ -276,9 +278,45 @@ const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => {
     position: 'relative',
     zIndex: 15,
   },
+  topContainer: {
+    position: 'absolute',
+    top: '-30px',
+    left: '0px',
+    right: '0px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    zIndex: 999,
+    height: '25px',
+  },
+  iconWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '30px',
+    height: '30px',
+  },
 
-
- 
+  percentageWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '30px',
+    paddingLeft: '8px',
+    paddingRight: '8px',
+    position: 'relative',
+    top: '5px',
+    right: '-10px',
+  },
+  percentage: {
+    fontSize: '18px',
+    fontWeight: 700,
+    color: '#ffffff',
+    textShadow: '0 2px 4px rgba(0, 0, 0, 0.8)',
+    letterSpacing: '0.5px',
+    minWidth: '50px',
+    textAlign: 'center',
+  },
   });
 });
 
@@ -341,17 +379,67 @@ const ParticleSystem: React.FC = () => {
 
 const Progressbar: React.FC = () => {
   const glass = useGlassStyle();
-  const { classes, cx } = useStyles({ glass });
+  const theme = useSafeTheme();
+  const safeThemeColor = theme.colors?.[theme.primaryColor]?.[theme.fn?.primaryShade() ?? 8] ?? '#ef4444';
+  const { classes, cx } = useStyles({ glass, safeThemeColor });
   const [visible, setVisible] = React.useState(false);
   const [label, setLabel] = React.useState('');
   const [duration, setDuration] = React.useState(0);
+  const [icon, setIcon] = React.useState<IconProp>('clock');
+  const [percentage, setPercentage] = React.useState(0);
   
-  useNuiEvent('progressCancel', () => setVisible(false));
+  // Add cleanup for potential race conditions
+  const cancelRef = React.useRef<boolean>(false);
+  const startTimeRef = React.useRef<number>(0);
+  const animationFrameRef = React.useRef<number>(0);
+  
+  // Update percentage in real-time
+  const updatePercentage = React.useCallback(() => {
+    if (!visible || cancelRef.current) return;
+    
+    const elapsed = Date.now() - startTimeRef.current;
+    const currentPercentage = Math.min(Math.round((elapsed / duration) * 100), 100);
+    
+    setPercentage(currentPercentage);
+    
+    if (currentPercentage < 100) {
+      animationFrameRef.current = requestAnimationFrame(updatePercentage);
+    }
+  }, [visible, duration]);
+
+  React.useEffect(() => {
+    if (visible && duration > 0) {
+      startTimeRef.current = Date.now();
+      setPercentage(0);
+      animationFrameRef.current = requestAnimationFrame(updatePercentage);
+    }
+    
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [visible, duration, updatePercentage]);
+
+  useNuiEvent('progressCancel', () => {
+    cancelRef.current = true;
+    setVisible(false);
+    setPercentage(0);
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+  });
 
   useNuiEvent<ProgressbarProps>('progress', (data) => {
+    // Reset cancel flag and set new progress
+    console.log('Progress bar data received:', JSON.stringify(data)); // Debug log
+    cancelRef.current = false;
     setVisible(true);
     setLabel(data.label);
     setDuration(data.duration);
+    setIcon(data.icon || 'clock'); // Default to clock icon
+    setPercentage(0);
+    console.log('Progress bar state set:', JSON.stringify({ icon: data.icon || 'clock', duration: data.duration, label: data.label })); // Debug log
   });
 
   return (
@@ -359,10 +447,24 @@ const Progressbar: React.FC = () => {
       <Box className={classes.wrapper}>
         <ScaleFade visible={visible} onExitComplete={() => fetchNui('progressComplete')}>
           <Box className={cx(classes.container)}>
+            {/* Top container with icon and percentage */}
+            <Box className={classes.topContainer}>
+              <Box className={classes.iconWrapper}>
+                <LibIcon icon={icon} size="lg" style={{ color: '#ffffff' }} />
+              </Box>
+              <Box className={classes.percentageWrapper}>
+                <Text className={classes.percentage}>{percentage}%</Text>
+              </Box>
+            </Box>
+            
             {/* Progress Bar with particles inside */}
             <Box
               className={classes.progressBar}
-              onAnimationEnd={() => setVisible(false)}
+              onAnimationEnd={() => {
+                if (!cancelRef.current) {
+                  setVisible(false);
+                }
+              }}
               sx={{
                 animation: 'progress-bar linear',
                 animationDuration: `${duration}ms`,

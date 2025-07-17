@@ -9,6 +9,7 @@ import MarkdownComponents from '../../config/MarkdownComponents';
 import LibIcon from '../../components/LibIcon';
 import { useGlassStyle } from '../../hooks/useGlassStyle';
 
+
 const breathe = keyframes({
   '0%, 100%': { 
     transform: 'scale(1)',
@@ -60,6 +61,7 @@ const horizontalPulse = keyframes({
 
 const useStyles = createStyles((theme, params: { position?: TextUiPosition }) => {
   const glass = useGlassStyle();
+  const safeThemeColor = theme.colors?.[theme.primaryColor]?.[theme.fn?.primaryShade() ?? 8] ?? '#ef4444';
   
   return {
     wrapper: {
@@ -237,8 +239,8 @@ const useStyles = createStyles((theme, params: { position?: TextUiPosition }) =>
       left: '0px', 
       width: '100px',
       height: '3px',
-      background: `linear-gradient(90deg, transparent, ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, transparent)`,
-      boxShadow: `0 0 20px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}`,
+      background: `linear-gradient(90deg, transparent, ${safeThemeColor}, ${safeThemeColor}, transparent)`,
+      boxShadow: `0 0 20px ${safeThemeColor}`,
       borderRadius: '2px',
       animation: `${horizontalPulse} 4s linear infinite`,
       zIndex: 10,

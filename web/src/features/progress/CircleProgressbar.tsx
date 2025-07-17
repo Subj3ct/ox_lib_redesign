@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStyles, keyframes, Stack, Text, useMantineTheme, Box } from '@mantine/core';
+import { createStyles, keyframes, Stack, Text, Box } from '@mantine/core';
 import { motion, useMotionValue, useTransform, animate, useMotionValueEvent } from 'framer-motion';
 import { useNuiEvent } from '../../hooks/useNuiEvent';
 import { fetchNui } from '../../utils/fetchNui';
@@ -7,6 +7,8 @@ import ScaleFade from '../../transitions/ScaleFade';
 import type { CircleProgressbarProps } from '../../typings';
 import { useGlassStyle } from '../../hooks/useGlassStyle';
 import type { GlassStyle } from '../../hooks/useGlassStyle';
+
+import { useSafeTheme } from '../../hooks/useSafeTheme';
 
 const breathe = keyframes({
   '0%, 100%': { 
@@ -44,8 +46,6 @@ const slideOutScale = keyframes({
     opacity: 0,
   },
 });
-
-
 
 const CircularParticleSystem: React.FC = () => {
   const particles = React.useMemo(() => {
@@ -228,7 +228,6 @@ const useStyles = createStyles((theme, { position, duration, glass }: { position
     maxWidth: '200px',
     lineHeight: 1.4,
   },
-
 }));
 
 const CircleProgressbar: React.FC = () => {
@@ -236,7 +235,7 @@ const CircleProgressbar: React.FC = () => {
   const [progressDuration, setProgressDuration] = React.useState(0);
   const [position, setPosition] = React.useState<'middle' | 'bottom'>('middle');
   const [label, setLabel] = React.useState('');
-  const theme = useMantineTheme();
+  const theme = useSafeTheme();
   const glass = useGlassStyle();
   const { classes, cx } = useStyles({ position, duration: progressDuration, glass });
   
@@ -244,17 +243,36 @@ const CircleProgressbar: React.FC = () => {
   const percentage = useTransform(progress, [0, 1], [0, 100]);
   const [currentPercentage, setCurrentPercentage] = React.useState(0);
   
+  // Add cleanup for potential race conditions
+  const cancelRef = React.useRef<boolean>(false);
+  const animationRef = React.useRef<any>(null);
+  
+  // Get safe theme color
+  const safeThemeColor = theme.colors?.[theme.primaryColor]?.[theme.fn?.primaryShade() ?? 8] ?? '#ef4444';
+  
   useMotionValueEvent(percentage, "change", (latest) => {
     setCurrentPercentage(Math.round(latest));
   });
 
   useNuiEvent('progressCancel', () => {
+    cancelRef.current = true;
+    if (animationRef.current) {
+      animationRef.current.stop();
+    }
     progress.set(1);
     setVisible(false);
   });
 
   useNuiEvent<CircleProgressbarProps>('circleProgress', (data) => {
-    if (visible) return;
+    // Prevent race condition if already visible
+    if (visible && !cancelRef.current) return;
+    
+    // Reset cancel flag and animation
+    cancelRef.current = false;
+    if (animationRef.current) {
+      animationRef.current.stop();
+    }
+    
     setVisible(true);
     setLabel(data.label || '');
     setProgressDuration(data.duration);
@@ -262,10 +280,15 @@ const CircleProgressbar: React.FC = () => {
     
     progress.set(0);
     setCurrentPercentage(0);
-    animate(progress, 1, {
+    
+    animationRef.current = animate(progress, 1, {
       duration: data.duration / 1000, // Convert to seconds
       ease: "linear",
-      onComplete: () => setVisible(false)
+      onComplete: () => {
+        if (!cancelRef.current) {
+          setVisible(false);
+        }
+      }
     });
   });
 
@@ -299,8 +322,8 @@ const CircleProgressbar: React.FC = () => {
                   {/* Gradient Definition */}
                   <defs>
                     <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor={theme.colors[theme.primaryColor][theme.fn.primaryShade()]} />
-                      <stop offset="100%" stopColor={theme.colors[theme.primaryColor][4]} />
+                      <stop offset="0%" stopColor={safeThemeColor} />
+                      <stop offset="100%" stopColor={safeThemeColor} />
                     </linearGradient>
                   </defs>
                   
@@ -310,7 +333,7 @@ const CircleProgressbar: React.FC = () => {
                     cy={60}
                     r={52}
                     fill="transparent"
-                    stroke={theme.colors[theme.primaryColor][theme.fn.primaryShade()]}
+                    stroke={safeThemeColor}
                     strokeWidth={16}
                     strokeLinecap="round"
                     style={{
@@ -325,7 +348,7 @@ const CircleProgressbar: React.FC = () => {
                     cy={60}
                     r={52}
                     fill="transparent"
-                    stroke={theme.colors[theme.primaryColor][theme.fn.primaryShade()]}
+                    stroke={safeThemeColor}
                     strokeWidth={12}
                     strokeLinecap="round"
                     style={{

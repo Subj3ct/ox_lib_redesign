@@ -6,6 +6,7 @@ import { isIconUrl } from '../../../utils/isIconUrl';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import LibIcon from '../../../components/LibIcon';
 import { useGlassStyle } from '../../../hooks/useGlassStyle';
+import { useSafeTheme } from '../../../hooks/useSafeTheme';
 
 interface Props {
   item: MenuItem;
@@ -16,9 +17,11 @@ interface Props {
 }
 
 const useStyles = createStyles((theme, params: { iconColor?: string; selected: boolean; colorScheme?: string; disabled?: boolean; glass: ReturnType<typeof useGlassStyle> }) => {
+  
+  const safeTheme = useSafeTheme();
   const itemColor = params.colorScheme 
-    ? theme.colors[params.colorScheme]?.[theme.fn.primaryShade()] || theme.colors[params.colorScheme]?.[8] || params.colorScheme
-    : theme.colors[theme.primaryColor][theme.fn.primaryShade()];
+    ? safeTheme.colors[params.colorScheme]?.[safeTheme.fn.primaryShade()] || safeTheme.colors[params.colorScheme]?.[8] || params.colorScheme
+    : safeTheme.colors[safeTheme.primaryColor][safeTheme.fn.primaryShade()];
   
   const getRgbFromHex = (hex: string) => {
     const result = hex.replace('#', '').match(/.{2}/g);
@@ -261,9 +264,11 @@ const ListItem = forwardRef<Array<HTMLDivElement | null>, Props>(({ item, index,
               value={item.progress}
               color={item.colorScheme || 'red'}
               styles={(progressTheme) => {
+            
+                const safeProgressTheme = useSafeTheme();
                 // Respect the colorScheme property or fall back to theme color
-                const colorToUse = item.colorScheme || progressTheme.primaryColor;
-                const colorValue = progressTheme.colors[colorToUse]?.[progressTheme.fn.primaryShade()] || progressTheme.colors.red[8];
+                const colorToUse = item.colorScheme || safeProgressTheme.primaryColor;
+                const colorValue = safeProgressTheme.colors[colorToUse]?.[safeProgressTheme.fn.primaryShade()] || safeProgressTheme.colors.red[8];
                 
                 return {
                   root: { 

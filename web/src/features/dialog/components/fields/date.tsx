@@ -2,9 +2,11 @@ import { IDateInput } from '../../../../typings/dialog';
 import { Control, useController } from 'react-hook-form';
 import { FormValues } from '../../InputDialog';
 import { DatePicker, DateRangePicker } from '@mantine/dates';
-import { createStyles, useMantineTheme } from '@mantine/core';
+import { createStyles } from '@mantine/core';
 import { useEffect } from 'react';
 import LibIcon from '../../../../components/LibIcon';
+import { useSafeTheme } from '../../../../hooks/useSafeTheme';
+
 
 interface Props {
   row: IDateInput;
@@ -75,53 +77,67 @@ const useStyles = createStyles((theme) => ({
 
 const DateField: React.FC<Props> = (props) => {
   const { classes } = useStyles();
-  const theme = useMantineTheme();
+  const theme = useSafeTheme();
   
   // Dynamically inject weekend color CSS based on theme
   useEffect(() => {
-    const themeColor = theme.colors[theme.primaryColor][theme.fn.primaryShade()];
-    
-    // Create or update CSS custom property for weekend colors
-    const style = document.createElement('style');
-    style.id = 'ox-lib-weekend-colors';
-    
-    // Remove existing style if it exists
-    const existingStyle = document.getElementById('ox-lib-weekend-colors');
-    if (existingStyle) {
-      existingStyle.remove();
-    }
-    
-    style.textContent = `
-      /* Dynamic weekend color override using theme color */
-      :root {
-        --ox-lib-weekend-color: ${themeColor};
+    try {
+      const themeColor = theme.colors?.[theme.primaryColor]?.[theme.fn?.primaryShade() ?? 8] ?? '#ef4444';
+      
+      // Validate the color before proceeding
+      if (!themeColor || typeof themeColor !== 'string' || themeColor.length === 0) {
+        return; // Skip injection if theme color is invalid
       }
       
-      /* Apply to all possible weekend date selectors */
-      .mantine-DatePicker-day[data-weekend="true"],
-      .mantine-DateRangePicker-day[data-weekend="true"],
-      .mantine-Calendar-day[data-weekend="true"],
-      .mantine-Month-day[data-weekend="true"],
-      .mantine-DatePicker-day.mantine-DatePicker-weekend,
-      .mantine-DateRangePicker-day.mantine-DateRangePicker-weekend,
-      .mantine-Calendar-day.mantine-Calendar-weekend,
-      .mantine-Month-day.mantine-Month-weekend,
-      [data-mantine-color-scheme] .mantine-DatePicker-day[data-weekend="true"],
-      [data-mantine-color-scheme] .mantine-DateRangePicker-day[data-weekend="true"] {
-        color: var(--ox-lib-weekend-color) !important;
+      // Create or update CSS custom property for weekend colors
+      const style = document.createElement('style');
+      style.id = 'ox-lib-weekend-colors';
+      
+      // Remove existing style if it exists
+      const existingStyle = document.getElementById('ox-lib-weekend-colors');
+      if (existingStyle) {
+        existingStyle.remove();
       }
-    `;
-    
-    document.head.appendChild(style);
+      
+      style.textContent = `
+        /* Dynamic weekend color override using theme color */
+        :root {
+          --ox-lib-weekend-color: ${themeColor};
+        }
+        
+        /* Apply to all possible weekend date selectors */
+        .mantine-DatePicker-day[data-weekend="true"],
+        .mantine-DateRangePicker-day[data-weekend="true"],
+        .mantine-Calendar-day[data-weekend="true"],
+        .mantine-Month-day[data-weekend="true"],
+        .mantine-DatePicker-day.mantine-DatePicker-weekend,
+        .mantine-DateRangePicker-day.mantine-DateRangePicker-weekend,
+        .mantine-Calendar-day.mantine-Calendar-weekend,
+        .mantine-Month-day.mantine-Month-weekend,
+        [data-mantine-color-scheme] .mantine-DatePicker-day[data-weekend="true"],
+        [data-mantine-color-scheme] .mantine-DateRangePicker-day[data-weekend="true"] {
+          color: var(--ox-lib-weekend-color) !important;
+        }
+      `;
+      
+      document.head.appendChild(style);
+    } catch (error) {
+      // Silently fail if CSS injection fails to prevent crashes
+      console.warn('ox_lib: Failed to inject weekend color CSS, using defaults');
+    }
     
     // Cleanup function to remove the style when component unmounts
     return () => {
-      const styleToRemove = document.getElementById('ox-lib-weekend-colors');
-      if (styleToRemove) {
-        styleToRemove.remove();
+      try {
+        const styleToRemove = document.getElementById('ox-lib-weekend-colors');
+        if (styleToRemove) {
+          styleToRemove.remove();
+        }
+      } catch (error) {
+        // Silently fail cleanup
       }
     };
-  }, [theme.colors, theme.primaryColor, theme.fn]);
+  }, [theme]);
   
   const controller = useController({
     name: `test.${props.index}.value`,

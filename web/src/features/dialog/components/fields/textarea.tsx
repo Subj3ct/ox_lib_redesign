@@ -1,4 +1,4 @@
-import { Textarea, createStyles, useMantineTheme } from '@mantine/core';
+import { Textarea, createStyles } from '@mantine/core';
 import { UseFormRegisterReturn } from 'react-hook-form';
 import { ITextarea } from '../../../../typings/dialog';
 import React from 'react';

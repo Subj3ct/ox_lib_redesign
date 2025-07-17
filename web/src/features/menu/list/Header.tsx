@@ -1,6 +1,7 @@
 import { Box, createStyles, Text, keyframes } from '@mantine/core';
 import React from 'react';
 import { useGlassStyle } from '../../../hooks/useGlassStyle';
+import { useSafeTheme } from '../../../hooks/useSafeTheme';
 
 const horizontalPulse = keyframes({
   '0%': {
@@ -14,7 +15,10 @@ const horizontalPulse = keyframes({
   },
 });
 
-const useStyles = createStyles((theme, params: { glass: ReturnType<typeof useGlassStyle> }) => ({
+const useStyles = createStyles((theme, params: { glass: ReturnType<typeof useGlassStyle> }) => {
+  const safeTheme = useSafeTheme();
+  
+  return {
     container: {
       position: 'relative',
       textAlign: 'center',
@@ -98,13 +102,14 @@ const useStyles = createStyles((theme, params: { glass: ReturnType<typeof useGla
       left: '0px', 
       width: '120px', 
       height: '3px', 
-      background: `linear-gradient(90deg, transparent, ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, transparent)`,
-      boxShadow: `0 0 20px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}`, 
+      background: `linear-gradient(90deg, transparent, ${safeTheme.colors[safeTheme.primaryColor][safeTheme.fn.primaryShade()]}, ${safeTheme.colors[safeTheme.primaryColor][safeTheme.fn.primaryShade()]}, transparent)`,
+      boxShadow: `0 0 20px ${safeTheme.colors[safeTheme.primaryColor][safeTheme.fn.primaryShade()]}`, 
       borderRadius: '2px', 
       animation: `${horizontalPulse} 5s linear infinite`, 
       zIndex: 10, 
     },
-}));
+  };
+});
 
 const Header: React.FC<{ title: string }> = ({ title }) => {
   const glass = useGlassStyle();

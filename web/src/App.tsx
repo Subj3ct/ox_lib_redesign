@@ -14,12 +14,13 @@ import { isEnvBrowser } from './utils/misc';
 import SkillCheck from './features/skillcheck';
 import RadialMenu from './features/menu/radial';
 import { theme } from './theme';
-import { MantineProvider } from '@mantine/core';
+import { MantineProvider, MantineThemeOverride } from '@mantine/core';
 import { useConfig } from './providers/ConfigProvider';
 import { GameRender } from './components/GameRender';
+import { useMemo } from 'react';
 
 const App: React.FC = () => {
-  const { config } = useConfig();
+  const { config, isLoading } = useConfig();
 
   useNuiEvent('setClipboard', (data: string) => {
     setClipboard(data);
@@ -27,8 +28,31 @@ const App: React.FC = () => {
 
   fetchNui('init');
 
+  // Create a properly merged theme with safe theme wrapper
+  const mergedTheme = useMemo(() => {
+    const baseTheme: MantineThemeOverride = {
+      ...theme,
+      primaryColor: config.primaryColor,
+      primaryShade: config.primaryShade,
+      colorScheme: config.darkMode ? 'dark' : 'light',
+    };
+    
+    return baseTheme;
+  }, [config.primaryColor, config.primaryShade, config.darkMode]);
+
+  // Don't render UI components until config is loaded to prevent theme flicker
+  if (isLoading) {
+    return (
+      <MantineProvider withNormalizeCSS withGlobalStyles theme={mergedTheme}>
+        <GameRender />
+        {/* Only show dev tools in browser during loading */}
+        {isEnvBrowser() && <Dev />}
+      </MantineProvider>
+    );
+  }
+
   return (
-    <MantineProvider withNormalizeCSS withGlobalStyles theme={{ ...theme, ...config }}>
+    <MantineProvider withNormalizeCSS withGlobalStyles theme={mergedTheme}>
       <GameRender />
       
       <Progressbar />

@@ -9,6 +9,7 @@ import HeaderButton from './components/HeaderButton';
 import ScaleFade from '../../../transitions/ScaleFade';
 import MarkdownComponents from '../../../config/MarkdownComponents';
 import { useGlassStyle } from '../../../hooks/useGlassStyle';
+import { useSafeTheme } from '../../../hooks/useSafeTheme';
 
 const openMenu = (id: string | undefined) => {
   fetchNui<ContextMenuProps>('openContext', { id: id, back: true });
@@ -72,7 +73,11 @@ const scrollGlow = keyframes({
   },
 });
 
-const useStyles = createStyles((theme, { glassStyle }: { glassStyle: any }) => ({
+const useStyles = createStyles((theme, { glassStyle }: { glassStyle: any }) => {
+  // Use safe theme access to prevent CSSStyleDeclaration errors
+  const safeTheme = useSafeTheme();
+  
+  return {
   container: {
     position: 'absolute',
     top: '15%',
@@ -166,8 +171,8 @@ const useStyles = createStyles((theme, { glassStyle }: { glassStyle: any }) => (
     left: '8px', 
     width: '60px', 
     height: '2px',
-    background: `linear-gradient(90deg, transparent, ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}, transparent)`,
-    boxShadow: `0 0 15px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]}`,
+    background: `linear-gradient(90deg, transparent, ${safeTheme.colors[safeTheme.primaryColor][safeTheme.fn.primaryShade()]}, ${safeTheme.colors[safeTheme.primaryColor][safeTheme.fn.primaryShade()]}, transparent)`,
+    boxShadow: `0 0 15px ${safeTheme.colors[safeTheme.primaryColor][safeTheme.fn.primaryShade()]}`,
     borderRadius: '1px',
     animation: `${horizontalPulse} 4.5s linear infinite`,
     zIndex: 10,
@@ -227,7 +232,8 @@ const useStyles = createStyles((theme, { glassStyle }: { glassStyle: any }) => (
     pointerEvents: 'none',
     zIndex: 1,
   },
-}));
+  };
+});
 
 const ContextMenu: React.FC = () => {
   const glassStyle = useGlassStyle();

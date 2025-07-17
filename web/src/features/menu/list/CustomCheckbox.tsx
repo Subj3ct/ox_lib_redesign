@@ -1,4 +1,5 @@
 import { Checkbox, createStyles } from '@mantine/core';
+import { useSafeTheme } from '../../../hooks/useSafeTheme';
 
 interface CustomCheckboxProps {
   checked: boolean;
@@ -6,9 +7,10 @@ interface CustomCheckboxProps {
 }
 
 const useStyles = createStyles((theme, params: { colorScheme?: string }) => {
+  const safeTheme = useSafeTheme();
   const checkboxColor = params.colorScheme 
-    ? theme.colors[params.colorScheme]?.[theme.fn.primaryShade()] || theme.colors[params.colorScheme]?.[8] || params.colorScheme
-    : theme.colors[theme.primaryColor][theme.fn.primaryShade()];
+    ? safeTheme.colors[params.colorScheme]?.[safeTheme.fn.primaryShade()] || safeTheme.colors[params.colorScheme]?.[8] || params.colorScheme
+    : safeTheme.colors[safeTheme.primaryColor][safeTheme.fn.primaryShade()];
   
   const getRgbFromHex = (hex: string) => {
     const result = hex.replace('#', '').match(/.{2}/g);

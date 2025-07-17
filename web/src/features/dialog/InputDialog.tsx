@@ -1,4 +1,4 @@
-import { Button, Group, Modal, Stack, createStyles, useMantineTheme, keyframes, Box } from '@mantine/core';
+import { Button, Group, Modal, Stack, createStyles, keyframes, Box } from '@mantine/core';
 import React from 'react';
 import { useNuiEvent } from '../../hooks/useNuiEvent';
 import { useLocales } from '../../providers/LocaleProvider';
@@ -18,6 +18,7 @@ import TimeField from './components/fields/time';
 import dayjs from 'dayjs';
 import { useConditionalGlassmorphism } from '../../components/GameRender';
 import { useGlassStyle } from '../../hooks/useGlassStyle';
+import { useSafeTheme } from '../../hooks/useSafeTheme';
 import type { GlassStyle } from '../../hooks/useGlassStyle';
 
 export type FormValues = {
@@ -278,7 +279,7 @@ const InputDialog: React.FC = () => {
   const { locale } = useLocales();
   const glass = useGlassStyle();
   const { classes, cx } = useStyles({ glass });
-  const theme = useMantineTheme();
+  const theme = useSafeTheme();
 
   // Enable glassmorphism when dialog is visible OR pre-warming
   useConditionalGlassmorphism(Boolean(visible || preWarm), 'InputDialog');
