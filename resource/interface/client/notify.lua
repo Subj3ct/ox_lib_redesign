@@ -52,20 +52,10 @@ function lib.notify(data)
     -- Validate style data to prevent CSSStyleDeclaration errors
     data.style = validateStyle(data.style)
 
-    if GetResourceState("17mov_Hud") == "started" then
-        if data.type == "inform" then
-            data.type = "info"
-        elseif data.type == "warning" then
-            data.type = "info"
-        end
-
-        exports["17mov_Hud"]:ShowNotification(data.description, data.type, data.title, data.duration)
-    else
-        SendNUIMessage({
-            action = 'notify',
-            data = data
-        })
-    end
+    SendNUIMessage({
+        action = 'notify',
+        data = data
+    })
 
     if not sound then return end
 
