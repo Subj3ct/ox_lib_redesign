@@ -16,7 +16,7 @@ import DateField from './components/fields/date';
 import TextareaField from './components/fields/textarea';
 import TimeField from './components/fields/time';
 import dayjs from 'dayjs';
-import { useConditionalGlassmorphism } from '../../components/GameRender';
+
 import { useGlassStyle } from '../../hooks/useGlassStyle';
 import { useSafeTheme } from '../../hooks/useSafeTheme';
 import type { GlassStyle } from '../../hooks/useGlassStyle';
@@ -93,29 +93,9 @@ const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => ({
     position: 'relative',
     overflow: 'hidden',
     fontFamily: 'Roboto',
-    background: glass.isDarkMode ? `
-      linear-gradient(135deg, 
-        rgba(0, 0, 0, 0.25) 0%,
-        rgba(0, 0, 0, 0.18) 25%,
-        rgba(0, 0, 0, 0.12) 50%,
-        rgba(0, 0, 0, 0.08) 75%,
-        rgba(0, 0, 0, 0.15) 100%
-      ),
-      linear-gradient(45deg,
-        rgba(20, 20, 20, 0.4) 0%,
-        rgba(10, 10, 10, 0.5) 50%,
-        rgba(0, 0, 0, 0.6) 100%
-      )
-    ` : 'rgba(255, 255, 255, 0.1)',
-    border: `1px solid ${glass.isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.2)'}`,
-    backdropFilter: glass.isDarkMode ? undefined : 'blur(20px)',
-    WebkitBackdropFilter: glass.isDarkMode ? undefined : 'blur(20px)',
-    boxShadow: glass.isDarkMode ? `
-      0 12px 40px rgba(0, 0, 0, 0.7),
-      0 6px 20px rgba(0, 0, 0, 0.6),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.4)
-    ` : '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+    background: glass.mainBackground,
+    border: `1px solid ${glass.border}`,
+    boxShadow: glass.shadow,
     borderRadius: '12px',
     '&::before': {
       content: '""',
@@ -124,11 +104,7 @@ const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => ({
       left: 0,
       right: 0,
       bottom: 0,
-      background: glass.isDarkMode ? `
-        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
-        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
-        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 40%)
-      ` : 'inherit',
+      background: glass.textureOverlay,
       borderRadius: 'inherit',
       animation: `${breathe} 3s ease-in-out infinite`,
       zIndex: -1,
@@ -274,15 +250,13 @@ const InputDialog: React.FC = () => {
     rows: [{ type: 'input', label: '' }],
   });
   const [visible, setVisible] = React.useState(false);
-  const [preWarm, setPreWarm] = React.useState(false); // Pre-warm glassmorphism
   const [isExiting, setIsExiting] = React.useState(false);
   const { locale } = useLocales();
   const glass = useGlassStyle();
   const { classes, cx } = useStyles({ glass });
   const theme = useSafeTheme();
 
-  // Enable glassmorphism when dialog is visible OR pre-warming
-  useConditionalGlassmorphism(Boolean(visible || preWarm), 'InputDialog');
+
 
   const form = useForm<{ test: { value: any }[] }>({});
   const fieldForm = useFieldArray({
@@ -291,8 +265,6 @@ const InputDialog: React.FC = () => {
   });
 
   useNuiEvent<InputProps>('openDialog', (data) => {
-    // Pre-warm glassmorphism for instant canvas availability
-    setPreWarm(true);
     setFields(data);
     setIsExiting(false);
     
@@ -321,18 +293,13 @@ const InputDialog: React.FC = () => {
       }
     });
     
-    // Small delay to ensure canvas is ready, then show dialog
-    setTimeout(() => {
-      setVisible(true);
-      setPreWarm(false); // Stop pre-warming, visible takes over
-    }, 50); // 50ms pre-warm for instant appearance
+    setVisible(true);
   });
 
   useNuiEvent('closeInputDialog', async () => await handleClose(true));
 
   const handleClose = async (dontPost?: boolean) => {
     setIsExiting(true);
-    setPreWarm(false); // Stop pre-warming
     setTimeout(async () => {
       setVisible(false);
       setIsExiting(false);
@@ -384,6 +351,9 @@ const InputDialog: React.FC = () => {
             background: 'transparent',
             boxShadow: 'none',
             padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           },
         }}
         transition="fade"

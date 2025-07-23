@@ -432,14 +432,12 @@ const Progressbar: React.FC = () => {
 
   useNuiEvent<ProgressbarProps>('progress', (data) => {
     // Reset cancel flag and set new progress
-    console.log('Progress bar data received:', JSON.stringify(data)); // Debug log
     cancelRef.current = false;
     setVisible(true);
     setLabel(data.label);
     setDuration(data.duration);
     setIcon(data.icon || 'clock'); // Default to clock icon
     setPercentage(0);
-    console.log('Progress bar state set:', JSON.stringify({ icon: data.icon || 'clock', duration: data.duration, label: data.label })); // Debug log
   });
 
   return (
