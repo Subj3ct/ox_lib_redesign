@@ -86,7 +86,31 @@ const useStyles = createStyles((theme, { glassStyle }: { glassStyle: any }) => {
     height: 'fit-content', 
     maxHeight: '70vh', 
     fontFamily: 'Roboto',
-    background: glassStyle.mainBackground,
+    background: glassStyle.isDarkMode ? `
+      linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.65) 0%,
+        rgba(20, 20, 20, 0.55) 25%,
+        rgba(10, 10, 10, 0.75) 50%,
+        rgba(0, 0, 0, 0.85) 75%,
+        rgba(5, 5, 5, 0.70) 100%
+      ),
+      linear-gradient(45deg,
+        rgba(30, 30, 30, 0.6) 0%,
+        rgba(15, 15, 15, 0.7) 50%,
+        rgba(0, 0, 0, 0.8) 100%
+      )
+    ` : `
+      linear-gradient(160deg, 
+        rgba(200, 200, 200, 0.08) 0%,
+        rgba(180, 180, 180, 0.05) 50%,
+        rgba(190, 190, 190, 0.07) 100%
+      ),
+      linear-gradient(20deg,
+        rgba(210, 210, 210, 0.10) 0%,
+        rgba(195, 195, 195, 0.12) 50%,
+        rgba(185, 185, 185, 0.11) 100%
+      )
+    `,
     border: `1px solid ${glassStyle.border}`,
     boxShadow: glassStyle.shadow,
     borderRadius: '12px',
@@ -124,7 +148,31 @@ const useStyles = createStyles((theme, { glassStyle }: { glassStyle: any }) => {
   titleContainer: {
     borderRadius: '8px',
     flex: '1 85%',
-    background: glassStyle.mainBackground,
+    background: glassStyle.isDarkMode ? `
+      linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.65) 0%,
+        rgba(20, 20, 20, 0.55) 25%,
+        rgba(10, 10, 10, 0.75) 50%,
+        rgba(0, 0, 0, 0.85) 75%,
+        rgba(5, 5, 5, 0.70) 100%
+      ),
+      linear-gradient(45deg,
+        rgba(30, 30, 30, 0.6) 0%,
+        rgba(15, 15, 15, 0.7) 50%,
+        rgba(0, 0, 0, 0.8) 100%
+      )
+    ` : `
+      linear-gradient(160deg, 
+        rgba(200, 200, 200, 0.08) 0%,
+        rgba(180, 180, 180, 0.05) 50%,
+        rgba(190, 190, 190, 0.07) 100%
+      ),
+      linear-gradient(20deg,
+        rgba(210, 210, 210, 0.10) 0%,
+        rgba(195, 195, 195, 0.12) 50%,
+        rgba(185, 185, 185, 0.11) 100%
+      )
+    `,
     border: `1px solid ${glassStyle.border}`,
     position: 'relative',
     overflow: 'hidden',

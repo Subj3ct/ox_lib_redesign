@@ -96,17 +96,15 @@ const useStyles = createStyles((theme, params: { position?: TextUiPosition }) =>
           rgba(0, 0, 0, 0.8) 100%
         )
       ` : `
-        linear-gradient(135deg, 
-          rgba(255, 255, 255, 0.25) 0%,
-          rgba(255, 255, 255, 0.18) 25%,
-          rgba(255, 255, 255, 0.12) 50%,
-          rgba(255, 255, 255, 0.08) 75%,
-          rgba(255, 255, 255, 0.15) 100%
+        linear-gradient(160deg, 
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.05) 50%,
+          rgba(255, 255, 255, 0.07) 100%
         ),
-        linear-gradient(45deg,
-          rgba(120, 120, 120, 0.4) 0%,
-          rgba(100, 100, 100, 0.5) 50%,
-          rgba(80, 80, 80, 0.6) 100%
+        linear-gradient(20deg,
+          rgba(255, 255, 255, 0.10) 0%,
+          rgba(255, 255, 255, 0.12) 50%,
+          rgba(255, 255, 255, 0.11) 100%
         )
       `,
       border: glass.isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(255, 255, 255, 0.3)',

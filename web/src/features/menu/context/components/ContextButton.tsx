@@ -1,4 +1,4 @@
-import { Button, createStyles, Group, HoverCard, Image, Progress, Stack, Text, keyframes } from '@mantine/core';
+import { Button, createStyles, Group, HoverCard, Image, Progress, Stack, Text, keyframes, useMantineTheme } from '@mantine/core';
 import ReactMarkdown from 'react-markdown';
 import { ContextMenuProps, Option } from '../../../../typings';
 import { fetchNui } from '../../../../utils/fetchNui';
@@ -68,38 +68,76 @@ const useStyles = createStyles((theme, params: { disabled?: boolean; readOnly?: 
     overflow: 'hidden',
     fontFamily: 'Roboto',
     background: params.disabled 
-      ? `
-        linear-gradient(160deg, 
-          rgba(255, 255, 255, 0.03) 0%,
-          rgba(255, 255, 255, 0.02) 50%,
-          rgba(255, 255, 255, 0.025) 100%
-        )
-      `
-      : params.readOnly 
+      ? theme.colorScheme === 'dark'
         ? `
           linear-gradient(160deg, 
-            rgba(255, 255, 255, 0.12) 0%,
-            rgba(255, 255, 255, 0.08) 50%,
-            rgba(255, 255, 255, 0.10) 100%
-          ),
-          linear-gradient(20deg,
-            rgba(255, 255, 255, 0.15) 0%,
-            rgba(255, 255, 255, 0.18) 50%,
-            rgba(255, 255, 255, 0.16) 100%
+            rgba(100, 100, 100, 0.03) 0%,
+            rgba(80, 80, 80, 0.02) 50%,
+            rgba(90, 90, 90, 0.025) 100%
           )
         `
         : `
           linear-gradient(160deg, 
-            rgba(255, 255, 255, 0.12) 0%,
-            rgba(255, 255, 255, 0.08) 50%,
-            rgba(255, 255, 255, 0.10) 100%
-          ),
-          linear-gradient(20deg,
-            rgba(255, 255, 255, 0.15) 0%,
-            rgba(255, 255, 255, 0.18) 50%,
-            rgba(255, 255, 255, 0.16) 100%
-          )
-        `,
+            rgba(255, 255, 255, 0.03) 0%,
+            rgba(255, 255, 255, 0.02) 50%,
+            rgba(255, 255, 255, 0.025) 100%
+          ) !important
+        `
+              : params.readOnly 
+          ? theme.colorScheme === 'dark'
+            ? `
+              linear-gradient(135deg, 
+                rgba(0, 0, 0, 0.65) 0%,
+                rgba(20, 20, 20, 0.55) 25%,
+                rgba(10, 10, 10, 0.75) 50%,
+                rgba(0, 0, 0, 0.85) 75%,
+                rgba(5, 5, 5, 0.70) 100%
+              ),
+              linear-gradient(45deg,
+                rgba(30, 30, 30, 0.6) 0%,
+                rgba(15, 15, 15, 0.7) 50%,
+                rgba(0, 0, 0, 0.8) 100%
+              )
+            `
+            : `
+              linear-gradient(160deg, 
+                rgba(255, 255, 255, 0.25) 0%,
+                rgba(255, 255, 255, 0.20) 50%,
+                rgba(255, 255, 255, 0.30) 100%
+              ),
+              linear-gradient(20deg,
+                rgba(255, 255, 255, 0.35) 0%,
+                rgba(255, 255, 255, 0.40) 50%,
+                rgba(255, 255, 255, 0.45) 100%
+              )
+            `
+          : theme.colorScheme === 'dark'
+            ? `
+              linear-gradient(135deg, 
+                rgba(0, 0, 0, 0.65) 0%,
+                rgba(20, 20, 20, 0.55) 25%,
+                rgba(10, 10, 10, 0.75) 50%,
+                rgba(0, 0, 0, 0.85) 75%,
+                rgba(5, 5, 5, 0.70) 100%
+              ),
+              linear-gradient(45deg,
+                rgba(30, 30, 30, 0.6) 0%,
+                rgba(15, 15, 15, 0.7) 50%,
+                rgba(0, 0, 0, 0.8) 100%
+              )
+            `
+            : `
+              linear-gradient(160deg, 
+                rgba(255, 255, 255, 0.25) 0%,
+                rgba(255, 255, 255, 0.20) 50%,
+                rgba(255, 255, 255, 0.30) 100%
+              ),
+              linear-gradient(20deg,
+                rgba(255, 255, 255, 0.35) 0%,
+                rgba(255, 255, 255, 0.40) 50%,
+                rgba(255, 255, 255, 0.45) 100%
+              )
+            `,
     border: params.disabled 
       ? '1px solid rgba(255, 255, 255, 0.1)' 
       : '1px solid rgba(255, 255, 255, 0.18)',
@@ -135,7 +173,9 @@ const useStyles = createStyles((theme, params: { disabled?: boolean; readOnly?: 
     
     '&:hover': {
       background: params.disabled 
-        ? 'rgba(255, 255, 255, 0.02)' 
+        ? theme.colorScheme === 'dark'
+          ? 'rgba(100, 100, 100, 0.10)'
+          : 'rgba(8, 8, 8, 1.0)'
         : params.readOnly 
           ? 'rgba(255, 255, 255, 0.05)'
           : 'rgba(255, 255, 255, 0.12)', 
@@ -169,7 +209,9 @@ const useStyles = createStyles((theme, params: { disabled?: boolean; readOnly?: 
       filter: params.disabled ? 'grayscale(100%) opacity(0.4)' : 'none',
   },
   description: {
-      color: params.disabled ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.85)',
+      color: params.disabled 
+        ? (theme.colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.4)')
+        : (theme.colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.85)' : 'rgba(255, 255, 255, 0.85)'),
       fontSize: '13px',
       fontFamily: 'Roboto',
       lineHeight: 1.4,
@@ -202,13 +244,33 @@ const useStyles = createStyles((theme, params: { disabled?: boolean; readOnly?: 
     maxWidth: 280,
     width: 'fit-content',
     fontFamily: 'Roboto',
-    background: `
-      linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.08) 0%,
-        rgba(255, 255, 255, 0.05) 50%,
-        rgba(255, 255, 255, 0.06) 100%
-      )
-    `,
+    background: theme.colorScheme === 'dark'
+      ? `
+        linear-gradient(135deg, 
+          rgba(0, 0, 0, 0.65) 0%,
+          rgba(20, 20, 20, 0.55) 25%,
+          rgba(10, 10, 10, 0.75) 50%,
+          rgba(0, 0, 0, 0.85) 75%,
+          rgba(5, 5, 5, 0.70) 100%
+        ),
+        linear-gradient(45deg,
+          rgba(30, 30, 30, 0.6) 0%,
+          rgba(15, 15, 15, 0.7) 50%,
+          rgba(0, 0, 0, 0.8) 100%
+        )
+      `
+      : `
+        linear-gradient(160deg, 
+          rgba(255, 255, 255, 0.25) 0%,
+          rgba(255, 255, 255, 0.20) 50%,
+          rgba(255, 255, 255, 0.30) 100%
+        ),
+        linear-gradient(20deg,
+          rgba(255, 255, 255, 0.35) 0%,
+          rgba(255, 255, 255, 0.40) 50%,
+          rgba(255, 255, 255, 0.45) 100%
+        )
+      `,
     borderStyle: 'solid',
     borderWidth: '1px',
     borderColor: 'rgba(255, 255, 255, 0.12)',
@@ -260,8 +322,12 @@ const useStyles = createStyles((theme, params: { disabled?: boolean; readOnly?: 
       minWidth: 0,
       fontSize: '15px',
       fontWeight: 500,
-      color: params.disabled ? 'rgba(255, 255, 255, 0.4)' : '#ffffff',
-      textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
+      color: params.disabled 
+        ? (theme.colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.4)')
+        : '#ffffff',
+      textShadow: theme.colorScheme === 'dark' 
+        ? '0 1px 2px rgba(0, 0, 0, 0.4)' 
+        : 'none',
       letterSpacing: '-0.01em',
       transition: 'all 0.2s ease', 
       backdropFilter: 'none',
@@ -278,7 +344,9 @@ const useStyles = createStyles((theme, params: { disabled?: boolean; readOnly?: 
       },
       '& strong': {
         fontWeight: 600,
-        color: params.disabled ? 'rgba(255, 255, 255, 0.5)' : '#ffffff',
+        color: params.disabled 
+        ? (theme.colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(255, 255, 255, 0.4)')
+        : '#ffffff',
       },
   },
   buttonArrowContainer: {
@@ -337,6 +405,7 @@ const ContextButton: React.FC<{
 }> = ({ option, forceCloseHoverCards }) => {
   const button = option[1];
   const buttonKey = option[0];
+  const theme = useMantineTheme();
   const { classes } = useStyles({ disabled: button.disabled, readOnly: button.readOnly, colorScheme: button.colorScheme });
 
   return (
@@ -354,6 +423,9 @@ const ContextButton: React.FC<{
         <HoverCard.Target>
           <Button
             classNames={{ inner: classes.inner, label: classes.label, root: classes.button }}
+            style={button.disabled && theme.colorScheme === 'light' ? {
+              background: 'linear-gradient(160deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.02) 50%, rgba(255, 255, 255, 0.025) 100%) !important'
+            } : {}}
             onClick={() =>
               !button.disabled && !button.readOnly
                 ? button.menu

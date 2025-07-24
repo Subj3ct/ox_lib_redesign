@@ -34,10 +34,17 @@ const useStyles = createStyles((theme, params: { iconColor?: string; selected: b
     buttonContainer: {
       background: params.disabled 
         ? params.glass.isDarkMode ? `
-          linear-gradient(160deg, 
-            rgba(0, 0, 0, 0.25) 0%,
-            rgba(0, 0, 0, 0.18) 25%,
-            rgba(0, 0, 0, 0.12) 50%
+          linear-gradient(135deg, 
+            rgba(0, 0, 0, 0.65) 0%,
+            rgba(20, 20, 20, 0.55) 25%,
+            rgba(10, 10, 10, 0.75) 50%,
+            rgba(0, 0, 0, 0.85) 75%,
+            rgba(5, 5, 5, 0.70) 100%
+          ),
+          linear-gradient(45deg,
+            rgba(30, 30, 30, 0.6) 0%,
+            rgba(15, 15, 15, 0.7) 50%,
+            rgba(0, 0, 0, 0.8) 100%
           )
         ` : `
           linear-gradient(160deg, 
@@ -48,10 +55,17 @@ const useStyles = createStyles((theme, params: { iconColor?: string; selected: b
         `
         : params.selected 
           ? params.glass.isDarkMode ? `
-            linear-gradient(160deg, 
-              rgba(0, 0, 0, 0.35) 0%,
-              rgba(0, 0, 0, 0.28) 25%,
-              rgba(0, 0, 0, 0.22) 50%
+            linear-gradient(135deg, 
+              rgba(0, 0, 0, 0.65) 0%,
+              rgba(20, 20, 20, 0.55) 25%,
+              rgba(10, 10, 10, 0.75) 50%,
+              rgba(0, 0, 0, 0.85) 75%,
+              rgba(5, 5, 5, 0.70) 100%
+            ),
+            linear-gradient(45deg,
+              rgba(30, 30, 30, 0.6) 0%,
+              rgba(15, 15, 15, 0.7) 50%,
+              rgba(0, 0, 0, 0.8) 100%
             )
           ` : `
             linear-gradient(160deg, 
@@ -65,13 +79,20 @@ const useStyles = createStyles((theme, params: { iconColor?: string; selected: b
               rgba(255, 255, 255, 0.28) 100%
             )
           `
-          : params.glass.isDarkMode ? `
-            linear-gradient(160deg, 
-              rgba(0, 0, 0, 0.25) 0%,
-              rgba(0, 0, 0, 0.18) 25%,
-              rgba(0, 0, 0, 0.12) 50%
-            )
-          ` : `
+                  : params.glass.isDarkMode ? `
+          linear-gradient(135deg, 
+            rgba(0, 0, 0, 0.65) 0%,
+            rgba(20, 20, 20, 0.55) 25%,
+            rgba(10, 10, 10, 0.75) 50%,
+            rgba(0, 0, 0, 0.85) 75%,
+            rgba(5, 5, 5, 0.70) 100%
+          ),
+          linear-gradient(45deg,
+            rgba(30, 30, 30, 0.6) 0%,
+            rgba(15, 15, 15, 0.7) 50%,
+            rgba(0, 0, 0, 0.8) 100%
+          )
+        ` : `
             linear-gradient(160deg, 
               rgba(255, 255, 255, 0.12) 0%,
               rgba(255, 255, 255, 0.08) 50%,

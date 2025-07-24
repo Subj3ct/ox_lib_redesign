@@ -67,17 +67,15 @@ const useStyles = createStyles((theme, { safeThemeColor, glass }: { safeThemeCol
           rgba(0, 0, 0, 0.8) 100%
         )
       ` : `
-        linear-gradient(135deg, 
-          rgba(255, 255, 255, 0.25) 0%,
-          rgba(255, 255, 255, 0.18) 25%,
-          rgba(255, 255, 255, 0.12) 50%,
-          rgba(255, 255, 255, 0.08) 75%,
-          rgba(255, 255, 255, 0.15) 100%
+        linear-gradient(160deg, 
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.05) 50%,
+          rgba(255, 255, 255, 0.07) 100%
         ),
-        linear-gradient(45deg,
-          rgba(120, 120, 120, 0.4) 0%,
-          rgba(100, 100, 100, 0.5) 50%,
-          rgba(80, 80, 80, 0.6) 100%
+        linear-gradient(20deg,
+          rgba(255, 255, 255, 0.10) 0%,
+          rgba(255, 255, 255, 0.12) 50%,
+          rgba(255, 255, 255, 0.11) 100%
         )
       `,
       border: `1px solid ${safeThemeColor}`,
@@ -128,17 +126,15 @@ const useStyles = createStyles((theme, { safeThemeColor, glass }: { safeThemeCol
             rgba(10, 10, 10, 0.9) 100%
           )
         ` : `
-          linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.35) 0%,
-            rgba(255, 255, 255, 0.25) 25%,
-            rgba(255, 255, 255, 0.18) 50%,
-            rgba(255, 255, 255, 0.12) 75%,
-            rgba(255, 255, 255, 0.22) 100%
+          linear-gradient(160deg, 
+            rgba(255, 255, 255, 0.15) 0%,
+            rgba(255, 255, 255, 0.10) 50%,
+            rgba(255, 255, 255, 0.12) 100%
           ),
-          linear-gradient(45deg,
-            rgba(120, 120, 120, 0.5) 0%,
-            rgba(100, 100, 100, 0.6) 50%,
-            rgba(80, 80, 80, 0.7) 100%
+          linear-gradient(20deg,
+            rgba(255, 255, 255, 0.18) 0%,
+            rgba(255, 255, 255, 0.20) 50%,
+            rgba(255, 255, 255, 0.19) 100%
           )
         `,
         boxShadow: glass.isDarkMode ? `

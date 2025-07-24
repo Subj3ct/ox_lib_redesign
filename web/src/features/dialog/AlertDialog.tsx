@@ -78,7 +78,31 @@ const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => ({
     position: 'relative',
     overflow: 'hidden',
     fontFamily: 'Roboto',
-    background: glass.mainBackground,
+    background: glass.isDarkMode ? `
+      linear-gradient(135deg, 
+        rgba(45, 45, 45, 0.4) 0%,
+        rgba(35, 35, 35, 0.3) 25%,
+        rgba(40, 40, 40, 0.5) 50%,
+        rgba(30, 30, 30, 0.6) 75%,
+        rgba(38, 38, 38, 0.35) 100%
+      ),
+      linear-gradient(45deg,
+        rgba(50, 50, 50, 0.3) 0%,
+        rgba(42, 42, 42, 0.4) 50%,
+        rgba(35, 35, 35, 0.5) 100%
+      )
+    ` : `
+      linear-gradient(160deg, 
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(255, 255, 255, 0.07) 100%
+      ),
+      linear-gradient(20deg,
+        rgba(255, 255, 255, 0.10) 0%,
+        rgba(255, 255, 255, 0.12) 50%,
+        rgba(255, 255, 255, 0.11) 100%
+      )
+    `,
     border: `1px solid ${glass.border}`,
     boxShadow: glass.shadow,
     borderRadius: '12px',
@@ -89,7 +113,11 @@ const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => ({
       left: 0,
       right: 0,
       bottom: 0,
-      background: glass.textureOverlay,
+      background: glass.isDarkMode ? `
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.025) 0%, transparent 30%)
+      ` : glass.textureOverlay,
       borderRadius: 'inherit',
       animation: `${breathe} 3s ease-in-out infinite`,
       zIndex: -1,

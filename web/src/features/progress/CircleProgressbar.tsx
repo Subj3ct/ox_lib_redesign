@@ -125,29 +125,27 @@ const useStyles = createStyles((theme, { position, duration, glass }: { position
     fontFamily: 'Roboto',
     background: glass.isDarkMode ? `
       linear-gradient(135deg, 
-        rgba(0, 0, 0, 0.25) 0%,
-        rgba(0, 0, 0, 0.18) 25%,
-        rgba(0, 0, 0, 0.12) 50%,
-        rgba(0, 0, 0, 0.08) 75%,
-        rgba(0, 0, 0, 0.15) 100%
+        rgba(45, 45, 45, 0.4) 0%,
+        rgba(35, 35, 35, 0.3) 25%,
+        rgba(40, 40, 40, 0.5) 50%,
+        rgba(30, 30, 30, 0.6) 75%,
+        rgba(38, 38, 38, 0.35) 100%
       ),
       linear-gradient(45deg,
-        rgba(20, 20, 20, 0.4) 0%,
-        rgba(10, 10, 10, 0.5) 50%,
-        rgba(0, 0, 0, 0.6) 100%
+        rgba(50, 50, 50, 0.3) 0%,
+        rgba(42, 42, 42, 0.4) 50%,
+        rgba(35, 35, 35, 0.5) 100%
       )
     ` : `
-      linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.25) 0%,
-        rgba(255, 255, 255, 0.18) 25%,
-        rgba(255, 255, 255, 0.12) 50%,
-        rgba(255, 255, 255, 0.08) 75%,
-        rgba(255, 255, 255, 0.15) 100%
+      linear-gradient(160deg, 
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(255, 255, 255, 0.07) 100%
       ),
-      linear-gradient(45deg,
-        rgba(120, 120, 120, 0.4) 0%,
-        rgba(100, 100, 100, 0.5) 50%,
-        rgba(80, 80, 80, 0.6) 100%
+      linear-gradient(20deg,
+        rgba(255, 255, 255, 0.10) 0%,
+        rgba(255, 255, 255, 0.12) 50%,
+        rgba(255, 255, 255, 0.11) 100%
       )
     `,
     border: `1px solid ${glass.isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.3)'}`,
