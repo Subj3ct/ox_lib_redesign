@@ -20,11 +20,24 @@ function RegisterCommand(commandName, callback, restricted)
 end
 
 RegisterNUICallback('getConfig', function(_, cb)
-    local settings = require 'resource.settings'
+    local darkMode = GetResourceKvpInt('dark_mode') == 1
+    
+    if GetResourceKvpInt('dark_mode') == nil then
+        local convarValue = GetConvar('ox:darkMode', '0')
+        if convarValue == 'true' or convarValue == '1' or convarValue == 'yes' then
+            darkMode = true
+        elseif convarValue == 'false' or convarValue == '0' or convarValue == 'no' then
+            darkMode = false
+        else
+            local numValue = tonumber(convarValue)
+            darkMode = numValue and numValue ~= 0 or false
+        end
+    end
+    
     cb({
         primaryColor = GetConvar('ox:primaryColor', 'red'),
         primaryShade = GetConvarInt('ox:primaryShade', 8),
-        darkMode = settings.dark_mode
+        darkMode = darkMode
     })
 end)
 

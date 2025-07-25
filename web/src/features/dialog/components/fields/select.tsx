@@ -20,8 +20,6 @@ const useStyles = createStyles((theme) => ({
       // Lighter glassmorphism background
       backgroundColor: 'rgba(255, 255, 255, 0.15)',
       border: '1px solid rgba(255, 255, 255, 0.25)',
-      backdropFilter: 'blur(10px)',
-      WebkitBackdropFilter: 'blur(10px)',
       borderRadius: '8px',
       // Better font for user-typed text
       fontFamily: 'Roboto, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif',
@@ -74,8 +72,6 @@ const useStyles = createStyles((theme) => ({
     position: 'fixed',
     backgroundColor: 'rgba(40, 40, 40, 0.95)',
     border: '1px solid rgba(255, 255, 255, 0.3)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
     borderRadius: '8px',
     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
     maxHeight: '200px',
@@ -166,8 +162,6 @@ const useStyles = createStyles((theme) => ({
   inputField: {
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
     border: '1px solid rgba(255, 255, 255, 0.25)',
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
     borderRadius: '8px',
     fontFamily: 'Roboto, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif',
     fontSize: '14px',
@@ -197,8 +191,6 @@ const useStyles = createStyles((theme) => ({
   multiSelectContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
     border: '1px solid rgba(255, 255, 255, 0.25)',
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
     borderRadius: '8px',
     padding: '4px 36px 4px 6px', // Add right padding for chevron space
     minHeight: '32px', // Match other input fields

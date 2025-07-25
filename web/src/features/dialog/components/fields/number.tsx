@@ -17,8 +17,6 @@ const useStyles = createStyles((theme) => ({
       // Lighter glassmorphism background
       backgroundColor: 'rgba(255, 255, 255, 0.15)',
       border: '1px solid rgba(255, 255, 255, 0.25)',
-      backdropFilter: 'blur(10px)',
-      WebkitBackdropFilter: 'blur(10px)',
       borderRadius: '8px',
       // Better font for user-typed text
       fontFamily: 'Roboto, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif',

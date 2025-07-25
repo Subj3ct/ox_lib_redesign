@@ -21,8 +21,6 @@ const useStyles = createStyles((theme) => ({
       // Lighter glassmorphism background
       backgroundColor: 'rgba(255, 255, 255, 0.15)',
       border: '1px solid rgba(255, 255, 255, 0.25)',
-      backdropFilter: 'blur(10px)',
-      WebkitBackdropFilter: 'blur(10px)',
       borderRadius: '8px',
       // Better font for user-typed text
       fontFamily: 'Roboto, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif',
@@ -173,8 +171,6 @@ const DateField: React.FC<Props> = (props) => {
               modal: {
                 backgroundColor: 'rgba(40, 40, 40, 0.95)',
                 border: '1px solid rgba(255, 255, 255, 0.3)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
                 borderRadius: '12px',
                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
                 width: '320px !important',
@@ -236,8 +232,6 @@ const DateField: React.FC<Props> = (props) => {
               modal: {
                 backgroundColor: 'rgba(40, 40, 40, 0.95)',
                 border: '1px solid rgba(255, 255, 255, 0.3)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
                 borderRadius: '12px',
                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
                 width: '320px !important',
