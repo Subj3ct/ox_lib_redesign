@@ -11,6 +11,7 @@ import MarkdownComponents from '../../config/MarkdownComponents';
 import { useGlassStyle } from '../../hooks/useGlassStyle';
 import { useSafeTheme } from '../../hooks/useSafeTheme';
 import type { GlassStyle } from '../../hooks/useGlassStyle';
+import { useConfig } from '../../providers/ConfigProvider';
 
 const breathe = keyframes({
   '0%, 100%': { 
@@ -35,16 +36,8 @@ const horizontalPulse = keyframes({
 
 const slideInScale = keyframes({
   '0%': {
-    transform: 'translateY(-40px) scale(0.8)',
+    transform: 'translateY(-10px) scale(0.95)',
     opacity: 0,
-  },
-  '50%': {
-    transform: 'translateY(10px) scale(1.05)',
-    opacity: 0.9,
-  },
-  '70%': {
-    transform: 'translateY(-5px) scale(0.98)',
-    opacity: 1,
   },
   '100%': {
     transform: 'translateY(0px) scale(1)',
@@ -58,7 +51,7 @@ const slideOutScale = keyframes({
     opacity: 1,
   },
   '100%': {
-    transform: 'translateY(-30px) scale(0.85)',
+    transform: 'translateY(-10px) scale(0.95)',
     opacity: 0,
   },
 });
@@ -123,12 +116,12 @@ const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => ({
       zIndex: -1,
     },
   },
-  containerEntering: {
-    animation: `${slideInScale} 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards`,
-  },
-  containerExiting: {
-    animation: `${slideOutScale} 0.25s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards`,
-  },
+      containerEntering: {
+      animation: `${slideInScale} 0.1s ease-out forwards`,
+    },
+    containerExiting: {
+      animation: `${slideOutScale} 0.08s ease-out forwards`,
+    },
   header: {
     background: 'transparent',
     padding: '12px 24px 16px 24px',
@@ -287,6 +280,7 @@ const AlertDialog: React.FC = () => {
   const glass = useGlassStyle();
   const { classes, cx } = useStyles({ glass });
   const theme = useSafeTheme();
+  const { config } = useConfig();
   const [opened, setOpened] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [dialogData, setDialogData] = useState<AlertProps>({
@@ -302,7 +296,7 @@ const AlertDialog: React.FC = () => {
     setTimeout(() => {
       setOpened(false);
       setIsExiting(false);
-    }, 250); 
+    }, config.disableAnimations ? 0 : 250); 
   };
 
   useNuiEvent('sendAlert', (data: AlertProps) => {
@@ -316,7 +310,7 @@ const AlertDialog: React.FC = () => {
     setTimeout(() => {
       setOpened(false);
       setIsExiting(false);
-    }, 250); 
+    }, config.disableAnimations ? 0 : 250); 
   });
 
   return (
@@ -344,15 +338,16 @@ const AlertDialog: React.FC = () => {
             justifyContent: 'center',
           },
         }}
-        transition="fade"
-        transitionDuration={800}
+        transition={config.disableAnimations ? undefined : "fade"}
+        transitionDuration={config.disableAnimations ? 0 : 800}
         title={null} // Remove default title
       >
         {/* Custom container with glassmorphism */}
         <Box 
           className={cx(
             classes.container,
-            !isExiting ? classes.containerEntering : classes.containerExiting
+            !config.disableAnimations && !isExiting ? classes.containerEntering : null,
+            !config.disableAnimations && isExiting ? classes.containerExiting : null
           )}
         >
           {/* Header with title and moving horizontal pulse */}

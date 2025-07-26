@@ -37,7 +37,8 @@ RegisterNUICallback('getConfig', function(_, cb)
     cb({
         primaryColor = GetConvar('ox:primaryColor', 'red'),
         primaryShade = GetConvarInt('ox:primaryShade', 8),
-        darkMode = darkMode
+        darkMode = darkMode,
+        disableAnimations = GetResourceKvpInt('disable_animations') == 1
     })
 end)
 

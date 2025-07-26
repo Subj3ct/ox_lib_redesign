@@ -8,6 +8,7 @@ interface Config {
   primaryColor: MantineColor;
   primaryShade: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
   darkMode: boolean;
+  disableAnimations?: boolean;
 }
 
 interface ConfigCtxValue {
@@ -23,6 +24,7 @@ const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =
     primaryColor: 'red',
     primaryShade: 8,
     darkMode: true, // Default to dark mode since it's more common in gaming
+    disableAnimations: false, // Default to animations enabled
   });
   const [isLoading, setIsLoading] = useState(true);
 

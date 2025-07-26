@@ -10,6 +10,7 @@ import ScaleFade from '../../../transitions/ScaleFade';
 import MarkdownComponents from '../../../config/MarkdownComponents';
 import { useGlassStyle } from '../../../hooks/useGlassStyle';
 import { useSafeTheme } from '../../../hooks/useSafeTheme';
+import { useConfig } from '../../../providers/ConfigProvider';
 
 const openMenu = (id: string | undefined) => {
   fetchNui<ContextMenuProps>('openContext', { id: id, back: true });
@@ -28,12 +29,8 @@ const breathe = keyframes({
 
 const slideInScale = keyframes({
   '0%': {
-    transform: 'translateY(-30px) scale(0.8)',
+    transform: 'translateY(-10px) scale(0.95)',
     opacity: 0,
-  },
-  '60%': {
-    transform: 'translateY(8px) scale(1.05)',
-    opacity: 0.9,
   },
   '100%': {
     transform: 'translateY(0px) scale(1)',
@@ -47,7 +44,7 @@ const slideOutScale = keyframes({
     opacity: 1,
   },
   '100%': {
-    transform: 'translateY(-30px) scale(0.85)',
+    transform: 'translateY(-10px) scale(0.95)',
     opacity: 0,
   },
 });
@@ -129,12 +126,12 @@ const useStyles = createStyles((theme, { glassStyle }: { glassStyle: any }) => {
       pointerEvents: 'none',
     },
   },
-  containerEntering: {
-    animation: `${slideInScale} 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards`,
-  },
-  containerExiting: {
-    animation: `${slideOutScale} 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`,
-  },
+      containerEntering: {
+      animation: `${slideInScale} 0.1s ease-out forwards`,
+    },
+    containerExiting: {
+      animation: `${slideOutScale} 0.08s ease-out forwards`,
+    },
   header: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -286,6 +283,7 @@ const useStyles = createStyles((theme, { glassStyle }: { glassStyle: any }) => {
 const ContextMenu: React.FC = () => {
   const glassStyle = useGlassStyle();
   const { classes, cx } = useStyles({ glassStyle });
+  const { config } = useConfig();
   const [visible, setVisible] = useState(false);
   const [isEntering, setIsEntering] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
@@ -303,7 +301,7 @@ const ContextMenu: React.FC = () => {
     setTimeout(() => {
     setVisible(false);
       setIsExiting(false);
-    }, 400); 
+    }, config.disableAnimations ? 0 : 80); // Instant if animations disabled
     fetchNui('closeContext');
   };
 
@@ -327,20 +325,20 @@ const ContextMenu: React.FC = () => {
     setTimeout(() => {
       setVisible(false);
       setIsExiting(false);
-    }, 400);
+    }, config.disableAnimations ? 0 : 80); // Instant if animations disabled
   });
 
   useNuiEvent<ContextMenuProps>('showContext', async (data) => {
     if (visible) {
       setIsExiting(true);
-      await new Promise((resolve) => setTimeout(resolve, 400));
+      await new Promise((resolve) => setTimeout(resolve, config.disableAnimations ? 0 : 80)); // Instant if animations disabled
       setIsExiting(false); // CRITICAL: Reset exit state before showing new menu
     }
     
     setContextMenu(data);
     setVisible(true);
     setIsEntering(true);
-    setTimeout(() => setIsEntering(false), 800);
+    setTimeout(() => setIsEntering(false), config.disableAnimations ? 0 : 100); // Instant if animations disabled
   });
 
   return (

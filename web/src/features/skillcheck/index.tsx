@@ -6,6 +6,7 @@ import { Box, createStyles, keyframes } from '@mantine/core';
 import { motion } from 'framer-motion';
 import type { GameDifficulty, SkillCheckProps } from '../../typings';
 import { useGlassStyle } from '../../hooks/useGlassStyle';
+import { useConfig } from '../../providers/ConfigProvider';
 
 
 export const circleCircumference = 2 * 50 * Math.PI;
@@ -31,40 +32,36 @@ const difficultyOffsets = {
 const breathe = keyframes({
   '0%, 100%': {
     transform: 'scale(1)',
-    opacity: 0.95,
+    opacity: 0.9,
   },
   '50%': {
-    transform: 'scale(1.02)',
+    transform: 'scale(1.01)',
     opacity: 1,
   },
 });
 
 const slideInScale = keyframes({
   '0%': {
-    transform: 'scale(0.3) rotate(180deg)',
+    transform: 'scale(0.2)',
     opacity: 0,
   },
-  '50%': {
-    transform: 'scale(1.1) rotate(0deg)',
-    opacity: 0.9,
-  },
-  '70%': {
-    transform: 'scale(0.95) rotate(0deg)',
-    opacity: 1,
+  '60%': {
+    transform: 'scale(1.05)',
+    opacity: 0.95,
   },
   '100%': {
-    transform: 'scale(1) rotate(0deg)',
+    transform: 'scale(1)',
     opacity: 1,
   },
 });
 
 const slideOutScale = keyframes({
   '0%': {
-    transform: 'scale(1) rotate(0deg)',
+    transform: 'scale(1)',
     opacity: 1,
   },
   '100%': {
-    transform: 'scale(0.3) rotate(-180deg)',
+    transform: 'scale(0.2)',
     opacity: 0,
   },
 });
@@ -141,7 +138,7 @@ const SkillCheckParticleSystem: React.FC<{ themeColor: string }> = ({ themeColor
   );
 };
 
-const useStyles = createStyles((theme, params: { difficultyOffset: number; isExiting: boolean; glass: ReturnType<typeof useGlassStyle> }) => {
+const useStyles = createStyles((theme, params: { difficultyOffset: number; isExiting: boolean; glass: ReturnType<typeof useGlassStyle>; disableAnimations?: boolean; config?: any }) => {
   // Use the safe theme color utility
   const themeColor = theme.colors?.[theme.primaryColor]?.[theme.fn?.primaryShade() ?? 8] ?? '#ef4444';
   
@@ -196,7 +193,7 @@ const useStyles = createStyles((theme, params: { difficultyOffset: number; isExi
       position: 'relative',
       width: '100%',
       height: '100%',
-      background: params.glass.isDarkMode ? `
+      background: (params.config?.darkMode ?? params.glass.isDarkMode) ? `
         linear-gradient(135deg, 
           rgba(45, 45, 45, 0.4) 0%,
           rgba(35, 35, 35, 0.3) 25%,
@@ -259,13 +256,15 @@ const useStyles = createStyles((theme, params: { difficultyOffset: number; isExi
           radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 40%)
         `,
         borderRadius: 'inherit',
-        animation: `${breathe} 3s ease-in-out infinite`,
+        animation: params.disableAnimations ? 'none' : `${breathe} 3s ease-in-out infinite`,
         zIndex: -1,
         pointerEvents: 'none',
       },
-      animation: params.isExiting 
-        ? `${slideOutScale} 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards`
-        : `${slideInScale} 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards`,
+      animation: params.disableAnimations 
+        ? 'none'
+        : params.isExiting 
+          ? `${slideOutScale} 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards`
+          : `${slideInScale} 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards`,
     },
 
     // SVG container - smaller
@@ -351,8 +350,6 @@ const useStyles = createStyles((theme, params: { difficultyOffset: number; isExi
       height: '60px',
       background: 'rgba(255, 255, 255, 0.15)',
       border: '2px solid rgba(255, 255, 255, 0.3)',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
       boxShadow: `0 8px 24px rgba(0, 0, 0, 0.2), inset 0 2px 0 rgba(255, 255, 255, 0.2), 0 0 20px ${safeRgba(rgb.r, rgb.g, rgb.b, 0.3)}`,
       borderRadius: '50%',
       display: 'flex',
@@ -403,7 +400,8 @@ const SkillCheck: React.FC = () => {
   const showTimeoutRef = useRef<number | null>(null);
   const hideTimeoutRef = useRef<number | null>(null);
   const glass = useGlassStyle();
-  const { classes, theme } = useStyles({ difficultyOffset: skillCheck.difficultyOffset, isExiting, glass });
+  const { config } = useConfig();
+  const { classes, theme } = useStyles({ difficultyOffset: skillCheck.difficultyOffset, isExiting, glass, disableAnimations: config.disableAnimations, config });
   
   // Get safe theme color for particles
   const safeThemeColor = theme.colors?.[theme.primaryColor]?.[theme.fn?.primaryShade() ?? 8] ?? '#ef4444';
@@ -437,10 +435,10 @@ const SkillCheck: React.FC = () => {
       setIsExiting(false);
       dataRef.current = null;
       dataIndexRef.current = 0;
-    }, 400);
+    }, config.disableAnimations ? 0 : 400);
     
     fetchNui('skillCheckOver', success);
-  }, [cleanup]);
+  }, [cleanup, config.disableAnimations]);
 
   useNuiEvent('startSkillCheck', (data: { difficulty: GameDifficulty | GameDifficulty[]; inputs?: string[] }) => {
     cleanup(); // Clear any existing timeouts before starting new skillcheck
@@ -470,7 +468,7 @@ const SkillCheck: React.FC = () => {
       setIsExiting(false);
       setVisible(true);
       setPreWarm(false);
-    }, 50);
+    }, config.disableAnimations ? 0 : 50);
   });
 
   useNuiEvent('skillCheckCancel', () => {

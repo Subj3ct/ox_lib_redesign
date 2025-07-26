@@ -20,6 +20,7 @@ import dayjs from 'dayjs';
 import { useGlassStyle } from '../../hooks/useGlassStyle';
 import { useSafeTheme } from '../../hooks/useSafeTheme';
 import type { GlassStyle } from '../../hooks/useGlassStyle';
+import { useConfig } from '../../providers/ConfigProvider';
 
 export type FormValues = {
   test: {
@@ -50,16 +51,8 @@ const horizontalPulse = keyframes({
 
 const slideInScale = keyframes({
   '0%': {
-    transform: 'translateY(-40px) scale(0.8)',
+    transform: 'translateY(-10px) scale(0.95)',
     opacity: 0,
-  },
-  '50%': {
-    transform: 'translateY(10px) scale(1.05)',
-    opacity: 0.9,
-  },
-  '70%': {
-    transform: 'translateY(-5px) scale(0.98)',
-    opacity: 1,
   },
   '100%': {
     transform: 'translateY(0px) scale(1)',
@@ -73,7 +66,7 @@ const slideOutScale = keyframes({
     opacity: 1,
   },
   '100%': {
-    transform: 'translateY(-30px) scale(0.85)',
+    transform: 'translateY(-10px) scale(0.95)',
     opacity: 0,
   },
 });
@@ -138,12 +131,12 @@ const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => ({
       zIndex: -1,
     },
   },
-  containerEntering: {
-    animation: `${slideInScale} 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards`,
-  },
-  containerExiting: {
-    animation: `${slideOutScale} 0.25s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards`,
-  },
+      containerEntering: {
+      animation: `${slideInScale} 0.1s ease-out forwards`,
+    },
+    containerExiting: {
+      animation: `${slideOutScale} 0.08s ease-out forwards`,
+    },
   header: {
     background: 'transparent',
     padding: '12px 24px 16px 24px',
@@ -283,6 +276,7 @@ const InputDialog: React.FC = () => {
   const glass = useGlassStyle();
   const { classes, cx } = useStyles({ glass });
   const theme = useSafeTheme();
+  const { config } = useConfig();
 
 
 
@@ -331,12 +325,12 @@ const InputDialog: React.FC = () => {
     setTimeout(async () => {
       setVisible(false);
       setIsExiting(false);
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, config.disableAnimations ? 0 : 200));
       form.reset();
       fieldForm.remove();
       if (dontPost) return;
       fetchNui('inputData');
-    }, 250);
+    }, config.disableAnimations ? 0 : 250);
   };
 
   const onSubmit = form.handleSubmit(async (data) => {
@@ -353,12 +347,12 @@ const InputDialog: React.FC = () => {
         }
       }
       Object.values(data.test).forEach((obj: { value: any }) => values.push(obj.value));
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, config.disableAnimations ? 0 : 200));
       form.reset();
       fieldForm.remove();
       setIsExiting(false);
       fetchNui('inputData', values);
-    }, 250);
+    }, config.disableAnimations ? 0 : 250);
   });
 
   return (
@@ -384,8 +378,8 @@ const InputDialog: React.FC = () => {
             justifyContent: 'center',
           },
         }}
-        transition="fade"
-        transitionDuration={800}
+        transition={config.disableAnimations ? undefined : "fade"}
+        transitionDuration={config.disableAnimations ? 0 : 800}
         title={null} // Remove default title
       >
         {/* Custom container with proper glassmorphism */}
@@ -393,8 +387,8 @@ const InputDialog: React.FC = () => {
           className={cx(
             classes.container,
             {
-              [classes.containerEntering]: !isExiting,
-              [classes.containerExiting]: isExiting,
+              [classes.containerEntering]: !config.disableAnimations && !isExiting,
+              [classes.containerExiting]: !config.disableAnimations && isExiting,
             }
           )}
         >

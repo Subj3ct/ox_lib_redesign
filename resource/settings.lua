@@ -37,7 +37,8 @@ local settings = {
     default_locale = GetConvar('ox:locale', 'en'),
     notification_position = safeGetKvp(GetResourceKvpString, 'notification_position', 'top-right'),
     notification_audio = safeGetKvp(GetResourceKvpInt, 'notification_audio') == 1,
-    dark_mode = safeGetKvp(GetResourceKvpInt, 'dark_mode', getDarkModeConvar()) == 1
+    dark_mode = safeGetKvp(GetResourceKvpInt, 'dark_mode', getDarkModeConvar()) == 1,
+    disable_animations = safeGetKvp(GetResourceKvpInt, 'disable_animations') == 1
 }
 
 local userLocales = GetConvarInt('ox:userLocales', 1) == 1
@@ -81,6 +82,12 @@ RegisterCommand('ox_lib', function()
             checked = settings.dark_mode,
         },
         {
+            type = 'checkbox',
+            label = 'Disable open/close animations',
+            description = 'Disable opening and closing animations for all ox_lib components',
+            checked = settings.disable_animations,
+        },
+        {
             type = 'select',
             label = locale('ui.settings.notification_position'),
             options = {
@@ -117,14 +124,15 @@ RegisterCommand('ox_lib', function()
 
     if not input then return end
 
-    ---@type boolean, boolean, string, string
-    local notification_audio, dark_mode, notification_position, locale = table.unpack(input)
+    ---@type boolean, boolean, boolean, string, string
+    local notification_audio, dark_mode, disable_animations, notification_position, locale = table.unpack(input)
 
     if userLocales and set('locale', locale) then lib.setLocale(locale) end
 
     set('notification_position', notification_position)
     set('notification_audio', notification_audio)
     set('dark_mode', dark_mode)
+    set('disable_animations', disable_animations)
     
     -- Always refresh NUI config after settings change
     SendNUIMessage({
@@ -132,7 +140,8 @@ RegisterCommand('ox_lib', function()
         data = {
             primaryColor = GetConvar('ox:primaryColor', 'red'),
             primaryShade = GetConvarInt('ox:primaryShade', 8),
-            darkMode = dark_mode  -- Use the new value directly
+            darkMode = dark_mode,  -- Use the new value directly
+            disableAnimations = disable_animations
         }
     })
 end)
