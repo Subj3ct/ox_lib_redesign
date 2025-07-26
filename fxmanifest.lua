@@ -46,3 +46,7 @@ server_scripts {
     'resource/**/server.lua',
     'resource/**/server/*.lua',
 }
+
+exports {
+    'getCurrentSettings'
+}

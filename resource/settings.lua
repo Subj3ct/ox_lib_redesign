@@ -144,6 +144,26 @@ RegisterCommand('ox_lib', function()
             disableAnimations = disable_animations
         }
     })
+    
+    -- Trigger event for other resources to update their theme
+    TriggerEvent('ox_lib:settingsChanged', {
+        darkMode = dark_mode,
+        notificationAudio = notification_audio,
+        disableAnimations = disable_animations,
+        notificationPosition = notification_position,
+        locale = locale
+    })
 end)
+
+-- Export function to get current settings
+function getCurrentSettings()
+    return {
+        darkMode = settings.dark_mode,
+        notificationAudio = settings.notification_audio,
+        disableAnimations = settings.disable_animations,
+        notificationPosition = settings.notification_position,
+        locale = settings.locale
+    }
+end
 
 return settings
