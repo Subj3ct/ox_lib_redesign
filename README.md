@@ -30,3 +30,9 @@ https://www.npmjs.com/package/@communityox/ox_lib
 - Install [CfxLua IntelliSense](https://marketplace.visualstudio.com/items?itemName=communityox.cfxlua-vscode-cox) to add natives and cfxlua runtime declarations to LLS.
   - You can load ox_lib into your global development environment by modifying workspace/user settings "Lua.workspace.library" with the resource path.
     - e.g. "c:/fxserver/resources/ox_lib"
+
+## Custom Options
+- Use the ```setr ox:darkMode``` convar to enable/disable dark mode by default (1 for dark mode, 0 for light)
+- Change the default progress bar icon(clock by default) by setting ```icon = 'icon'``` when you define your progres bars.
+- Switch between dark/light mode in-game via the ```/ox_lib``` command.
+- Enable/disable opening/closing animations via the ```/ox_lib``` command as well.
