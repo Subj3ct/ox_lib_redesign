@@ -24,13 +24,13 @@ const breathe = keyframes({
 
 const horizontalPulse = keyframes({
   '0%': {
-    transform: 'translateX(0)', // Start at left content edge
+    transform: 'translateX(0)',
   },
   '50%': {
-    transform: 'translateX(200px)', // Move 200px to the right (should cover most modal widths)
+    transform: 'translateX(200px)', 
   },
   '100%': {
-    transform: 'translateX(0)', // Return to left content edge
+    transform: 'translateX(0)', 
   },
 });
 
@@ -158,7 +158,6 @@ const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => ({
     padding: '20px 24px 24px 24px',
     position: 'relative',
     zIndex: 2,
-    // Ensure content doesn't inherit any transform animations
     transform: 'none',
   },
   contentText: {
@@ -169,13 +168,12 @@ const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => ({
     letterSpacing: '-0.005em',
     textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
     marginBottom: '24px',
-    // Ensure text content is stable and doesn't move
     position: 'relative',
     zIndex: 10,
     transform: 'none',
     '& p': {
       margin: '0 0 12px 0',
-      transform: 'none', // Ensure paragraphs don't move
+      transform: 'none',
       '&:last-child': {
         marginBottom: 0,
       },
