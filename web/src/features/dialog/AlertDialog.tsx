@@ -192,7 +192,6 @@ const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => ({
     justifyContent: 'flex-end',
     gap: '12px',
     marginTop: '24px',
-    // Ensure buttons don't inherit animations
     position: 'relative',
     zIndex: 10,
     transform: 'none',
@@ -211,9 +210,9 @@ const useStyles = createStyles((theme, { glass }: { glass: GlassStyle }) => ({
     cursor: 'pointer',
     position: 'relative',
     overflow: 'hidden',
-    transform: 'none', // Ensure buttons don't inherit parent transforms
+    transform: 'none', 
     '&:hover': {
-      transform: 'translateY(-1px)', // Only hover transform
+      transform: 'translateY(-1px)',
     },
     '&:active': {
       transform: 'translateY(0px)',
@@ -338,7 +337,7 @@ const AlertDialog: React.FC = () => {
         }}
         transition={config.disableAnimations ? undefined : "fade"}
         transitionDuration={config.disableAnimations ? 0 : 800}
-        title={null} // Remove default title
+        title={null}
       >
         {/* Custom container with glassmorphism */}
         <Box 
